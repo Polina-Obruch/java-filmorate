@@ -10,6 +10,9 @@ public class DateValidator implements ConstraintValidator<AfterData, LocalDate> 
 
     @Override
     public boolean isValid(LocalDate date, ConstraintValidatorContext constraintValidatorContext) {
+        if (date == null) {
+            return false;
+        }
         return date.isAfter(MIN_DATE_RELEASE);
     }
 }

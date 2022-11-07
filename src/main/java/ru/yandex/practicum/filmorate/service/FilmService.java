@@ -13,12 +13,12 @@ public class FilmService {
 
     public Film addFilm(int id, Film film) {
         film.setId(id);
-        films.put(id,film);
+        films.put(id, film);
         return film;
     }
 
     public Film updateFilm(int id, Film film) {
-        films.put(id,film);
+        films.put(id, film);
         return film;
     }
 
