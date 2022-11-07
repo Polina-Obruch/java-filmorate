@@ -44,7 +44,7 @@ public class FilmsValidatorTest {
     @DisplayName("Проверка невалидности releaseDate")
     void addFilmWithFailReleaseData() {
         Film film = createFilm("film", "char", "1895-12-27", 5);
-        Assertions.assertTrue(requestFilm(film, "{Дата релиза не может быть раньше 28 декабря 1895 года}"));
+        Assertions.assertTrue(requestFilm(film, "Дата релиза не может быть раньше 28 декабря 1895 года"));
     }
 
     private Film createFilm(String name, String description, String releaseDate, int duration) {

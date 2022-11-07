@@ -68,7 +68,7 @@ public class UserController {
         }
 
         if (bindingResult.hasFieldErrors("login")) {
-            log.debug("Ошибка валидации пользователя. Логин не может быть пустым");
+            log.debug("Ошибка валидации пользователя. Логин не может быть пустым и содержать пробелы");
             throw new UserValidationException();
         }
     }

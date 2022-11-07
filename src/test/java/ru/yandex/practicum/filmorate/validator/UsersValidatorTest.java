@@ -20,9 +20,15 @@ public class UsersValidatorTest {
     void addUserWithFailLogin() {
         User user = createUser("asd@Yandex.ru", " ", "Asd", "1995-10-25");
         User user1 = createUser("asd1@Yandex.ru", null, "Asd", "1995-10-25");
+        User user2 = createUser("asd2@Yandex.ru", "AS D", "Asd", "1995-10-25");
+        User user3 = createUser("asd2@Yandex.ru", "    ", "Asd", "1995-10-25");
+
         Assertions.assertAll(
-                () -> Assertions.assertTrue(requestUser(user, "Логин не может быть пустым")),
-                () -> Assertions.assertTrue(requestUser(user1, "Логин не может быть пустым"))
+                () -> Assertions.assertTrue(requestUser(user, "Логин не должен содержать пробелы")),
+                () -> Assertions.assertFalse(requestUser(user, "Логин не может быть пустым")),
+                () -> Assertions.assertTrue(requestUser(user1, "Логин не может быть пустым")),
+                () -> Assertions.assertTrue(requestUser(user2, "Логин не должен содержать пробелы")),
+                () -> Assertions.assertTrue(requestUser(user3, "Логин не должен содержать пробелы"))
         );
     }
 
@@ -45,7 +51,7 @@ public class UsersValidatorTest {
     @Test
     @DisplayName("Проверка невалидности birthday")
     void addUserWithFailBirthday() {
-        User user = createUser("asd@Yandex.ru", " ", "Asd", "2046-10-25");
+        User user = createUser("asd@Yandex.ru", "asd", "Asd", "2046-10-25");
         Assertions.assertTrue(requestUser(user, "Дата рождения не может быть в будущем"));
     }
 
