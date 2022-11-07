@@ -8,9 +8,9 @@ import java.time.LocalDate;
 
 @Data
 public class Film {
-    private int id;
+    private Integer id;
 
-    @NotNull(message = "Название фильма не может быть пустым")
+
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
 
@@ -21,5 +21,5 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность фильма не может быть отрицательным")
-    private int duration;
+    private Integer duration;
 }

@@ -1,46 +1,38 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.Generated;
-import lombok.extern.java.Log;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserUpdateException;
 import ru.yandex.practicum.filmorate.exception.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService service = new UserService();
     private int count;
 
     @GetMapping
     public List<User> getUsers() {
         log.debug("Выданы все пользователи");
-        return new ArrayList<>(users.values());
+        return service.getUsers();
     }
 
     @PostMapping
     public User addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         validateUser(bindingResult);
-
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-
         int id = getId();
-        user.setId(id);
-        users.put(id, user);
+        User saveUser = service.addUser(id, user);
         log.debug("Новый пользователь добавлен. Выданный id = " + id);
-        return user;
+        return saveUser;
     }
 
     @PutMapping
@@ -48,14 +40,15 @@ public class UserController {
         validateUser(bindingResult);
         int id = user.getId();
 
-        if (!users.containsKey(id)) {
+        //Не отправляем данные сервису, пока не убедимся в необходимости этого
+        if (!service.isContains(id)) {
             log.debug("Пользователь не может быть обновлен, так как отсутствует в базе данных");
             throw new UserUpdateException();
         }
 
-        users.put(id, user);
+        User saveUser = service.updateUser(id, user);
         log.debug("Пользователь с id = " + id + " был обновлен");
-        return user;
+        return saveUser;
     }
 
     private int getId() {

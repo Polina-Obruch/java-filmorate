@@ -7,34 +7,32 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.FilmUpdateException;
 import ru.yandex.practicum.filmorate.exception.FilmValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final FilmService service = new FilmService();
     private int count;
 
     @GetMapping
     public List<Film> getFilms() {
         log.debug("Выданы все фильмы");
-        return new ArrayList<>(films.values());
+        return service.getFilms();
     }
 
     @PostMapping
     public Film addFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
         validate(bindingResult);
         int id = getId();
-        film.setId(id);
-        films.put(id, film);
+        Film saveFilm = service.addFilm(id,film);
         log.debug("Новый фильм добавлен. Выданный id = " + id);
-        return film;
+        return saveFilm;
     }
 
     @PutMapping
@@ -42,12 +40,14 @@ public class FilmController {
         validate(bindingResult);
 
         int id = film.getId();
-        if (!films.containsKey(id)) {
+
+        //Не отправляем данные сервису, пока не убедимся в необходимости этого
+        if (!service.isContains(id)) {
             log.debug("Фильм не может быть обновлен, так как отсутвтвует в базе данных");
             throw new FilmUpdateException();
         }
 
-        films.put(id, film);
+        service.updateFilm(id,film);
         log.debug("Фильм с id = " + id + " был обновлен");
         return film;
     }
