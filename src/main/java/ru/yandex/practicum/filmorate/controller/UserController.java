@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserUpdateException;
 import ru.yandex.practicum.filmorate.exception.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -15,10 +15,10 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserService service = new UserService();
-    private int count;
+    private final UserService service;
 
     @GetMapping
     public List<User> getUsers() {
@@ -29,30 +29,17 @@ public class UserController {
     @PostMapping
     public User addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         validateUser(bindingResult);
-        int id = getId();
-        User saveUser = service.addUser(id, user);
-        log.debug("Новый пользователь добавлен. Выданный id = " + id);
+        User saveUser = service.addUser(user);
+        log.debug("Новый пользователь добавлен. Выданный id = " + saveUser.getId());
         return saveUser;
     }
 
     @PutMapping
     public User updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         validateUser(bindingResult);
-        int id = user.getId();
-
-        //Не отправляем данные сервису, пока не убедимся в необходимости этого
-        if (!service.isContains(id)) {
-            log.debug("Пользователь не может быть обновлен, так как отсутствует в базе данных");
-            throw new UserUpdateException();
-        }
-
-        User saveUser = service.updateUser(id, user);
-        log.debug("Пользователь с id = " + id + " был обновлен");
+        User saveUser = service.updateUser(user);
+        log.debug("Пользователь с id = " + saveUser.getId() + " был обновлен");
         return saveUser;
-    }
-
-    private int getId() {
-        return ++count;
     }
 
     //Для подробной записи ошибок в лог

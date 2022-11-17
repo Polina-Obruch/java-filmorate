@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmUpdateException;
 import ru.yandex.practicum.filmorate.exception.FilmValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -16,9 +16,9 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
-    private final FilmService service = new FilmService();
-    private int count;
+    private final FilmService service;
 
     @GetMapping
     public List<Film> getFilms() {
@@ -29,32 +29,19 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
         validate(bindingResult);
-        int id = getId();
-        Film saveFilm = service.addFilm(id,film);
-        log.debug("Новый фильм добавлен. Выданный id = " + id);
+        Film saveFilm = service.addFilm(film);
+        log.debug("Новый фильм добавлен. Выданный id = " + saveFilm.getId());
         return saveFilm;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
         validate(bindingResult);
-
-        int id = film.getId();
-
-        //Не отправляем данные сервису, пока не убедимся в необходимости этого
-        if (!service.isContains(id)) {
-            log.debug("Фильм не может быть обновлен, так как отсутвтвует в базе данных");
-            throw new FilmUpdateException();
-        }
-
-        service.updateFilm(id,film);
-        log.debug("Фильм с id = " + id + " был обновлен");
+        service.updateFilm(film);
+        log.debug("Фильм с id = " + film.getId() + " был обновлен");
         return film;
     }
 
-    private int getId() {
-        return ++count;
-    }
 
     //Для подробной записи ошибок в лог
     private void validate(BindingResult bindingResult) {

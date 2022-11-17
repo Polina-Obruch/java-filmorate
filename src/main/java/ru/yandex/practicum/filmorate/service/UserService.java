@@ -1,34 +1,49 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.UserUpdateException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
+@Service
 public class UserService {
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserStorage userStorage;
+    private Integer countId;
 
-    public User addUser(int id, User user) {
+    @Autowired
+    public UserService (UserStorage userStorage) {
+        this.userStorage = userStorage;
+        this.countId = 0;
+    }
+
+    public User addUser(User user) {
         User saveUser = validateName(user);
+        Integer id  = getId();
         saveUser.setId(id);
-        users.put(id, saveUser);
+        userStorage.add(id, saveUser);
         return saveUser;
     }
 
-    public User updateUser(int id, User user) {
+    public User updateUser(User user) {
         User saveUser = validateName(user);
-        users.put(id, saveUser);
-        return saveUser;
+        Integer id  = saveUser.getId();
+        if (userStorage.get(id) != null) {
+            userStorage.add( id, saveUser);
+            return saveUser;
+        }
+
+        log.debug("Пользователь не может быть обновлен, так как отсутствует в базе данных");
+        throw  new UserUpdateException();
     }
 
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
-    }
-
-    public boolean isContains(int id) {
-        return users.containsKey(id);
+        return userStorage.getAll();
     }
 
     private User validateName(User user) {
@@ -36,5 +51,9 @@ public class UserService {
             user.setName(user.getLogin());
         }
         return user;
+    }
+
+    private Integer getId() {
+        return ++countId;
     }
 }
