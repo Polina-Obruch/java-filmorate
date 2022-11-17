@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ru.yandex.practicum.filmorate.exception.FilmUpdateException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -39,8 +39,8 @@ public class FilmService {
             return film;
         }
 
-        log.debug("Фильм не может быть обновлен, так как отсутвтвует в базе данных");
-        throw new FilmUpdateException();
+        log.debug(String.format("Фильм с id = %d не был обновлен, так как не найден в базе",id));
+        throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе",id));
     }
 
     public List<Film> getFilms() {

@@ -16,7 +16,7 @@ public class InMemoryUserStorage implements UserStorage {
     public void add(Integer id, User user) {
         users.put(id, user);
     }
-    
+
     @Override
     public void remove(Integer id) {
         users.remove(id);

@@ -28,7 +28,7 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
-        validate(bindingResult);
+        validateFilm(bindingResult);
         Film saveFilm = service.addFilm(film);
         log.debug("Новый фильм добавлен. Выданный id = " + saveFilm.getId());
         return saveFilm;
@@ -36,33 +36,44 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
-        validate(bindingResult);
-        service.updateFilm(film);
+        validateFilm(bindingResult);
+        Film saveFilm = service.updateFilm(film);
         log.debug("Фильм с id = " + film.getId() + " был обновлен");
-        return film;
+        return saveFilm;
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike() {
+
     }
 
 
     //Для подробной записи ошибок в лог
-    private void validate(BindingResult bindingResult) {
+    private void validateFilm(BindingResult bindingResult) {
+        String errorMessage;
+
         if (bindingResult.hasFieldErrors("name")) {
-            log.debug("Ошибка валидации фильма. Название фильма не может быть пустым");
-            throw new FilmValidationException();
+            errorMessage = "Ошибка валидации фильма. Название фильма не может быть пустым.";
+            log.error(errorMessage);
+            throw new FilmValidationException(errorMessage);
         }
 
         if (bindingResult.hasFieldErrors("description")) {
-            log.debug("Ошибка валидации фильма. Описание не может превышать 200 символов");
-            throw new FilmValidationException();
+            errorMessage = "Ошибка валидации фильма. Описание не может превышать 200 символов.";
+            log.error(errorMessage);
+            throw new FilmValidationException(errorMessage);
         }
 
         if (bindingResult.hasFieldErrors("releaseDate")) {
-            log.debug("Ошибка валидации фильма. Дата релиза не может быть раньше 28 декабря 1895 года");
-            throw new FilmValidationException();
+            errorMessage = "Ошибка валидации фильма. Дата релиза не может быть раньше 28 декабря 1895 года.";
+            log.error(errorMessage);
+            throw new FilmValidationException(errorMessage);
         }
 
         if (bindingResult.hasFieldErrors("duration")) {
-            log.debug("Ошибка валидации фильма. Продолжительность фильма не может быть отрицательным");
-            throw new FilmValidationException();
+            errorMessage = "Ошибка валидации фильма. Продолжительность фильма не может быть отрицательным.";
+            log.error(errorMessage);
+            throw new FilmValidationException(errorMessage);
         }
     }
 }
