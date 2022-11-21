@@ -22,14 +22,16 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
-        log.debug("Выданы все пользователи");
-        return service.getUsers();
+        //Вызов функции через создание переменной для логирования данных
+        List<User> saveUsers = service.getUsers();
+        log.debug("Список всех пользователей был выдан");
+        return saveUsers;
     }
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable Integer id) {
         User user = service.getUser(id);
-        log.debug(String.format("Выдан пользователь с id = %d", id));
+        log.debug(String.format("Пользователь с id = %d был выдан", id));
         return user;
     }
 
@@ -37,7 +39,7 @@ public class UserController {
     public User addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         validateUser(bindingResult);
         User saveUser = service.addUser(user);
-        log.debug("Новый пользователь добавлен. Выданный id = " + saveUser.getId());
+        log.debug(String.format("Новый пользователь был добавлен. Выданный id = %d", saveUser.getId()));
         return saveUser;
     }
 
@@ -45,7 +47,7 @@ public class UserController {
     public User updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         validateUser(bindingResult);
         User saveUser = service.updateUser(user);
-        log.debug("Пользователь с id = " + saveUser.getId() + " был обновлен");
+        log.debug(String.format("Пользователь с id = %d был обновлен", saveUser.getId()));
         return saveUser;
     }
 
@@ -63,14 +65,17 @@ public class UserController {
 
     @GetMapping("{id}/friends")
     public List<User> getAllFriend(@PathVariable Integer id) {
-        return service.getAllFriends(id);
+        List<User> friends = service.getAllFriends(id);
+        log.debug(String.format("Пользователю с id = %d был выдан список друзей", id));
+        return friends;
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriend(@PathVariable Integer id, @PathVariable Integer otherId) {
-        return service.getCommonFriend(id, otherId);
+        List<User> common = service.getCommonFriend(id, otherId);
+        log.debug(String.format("Список общих друзей id  = %d c otherId = %d был выдан", id, otherId));
+        return common;
     }
-
 
     //Для подробной записи ошибок в лог
     private void validateUser(BindingResult bindingResult) {

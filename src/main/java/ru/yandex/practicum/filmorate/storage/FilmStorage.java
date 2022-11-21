@@ -8,10 +8,13 @@ import java.util.List;
 
 
 public interface FilmStorage {
+    void add(Integer id, Film film);
 
-     void add(Integer id, Film film);
-     void remove(Integer id);
-     Film get(Integer id);
-     List<Film> getAll();
+    void remove(Integer id);
 
+    Film get(Integer id);
+
+    List<Film> getAll();
+
+    boolean isContains(Integer id);
 }

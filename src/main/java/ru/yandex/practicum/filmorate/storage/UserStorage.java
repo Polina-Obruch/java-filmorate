@@ -9,7 +9,12 @@ import java.util.List;
 public interface UserStorage {
 
     void add(Integer id, User user);
+
     void remove(Integer id);
+
     User get(Integer id);
+
     List<User> getAll();
+
+    boolean isContains(Integer id);
 }
