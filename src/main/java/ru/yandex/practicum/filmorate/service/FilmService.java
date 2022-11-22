@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
@@ -16,17 +16,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
-    private Integer countId;
+    private Integer countId = 0;
     private final UserService userService;
 
-    @Autowired
-    public FilmService(FilmStorage filmStorage, UserService service) {
-        this.filmStorage = filmStorage;
-        this.userService = service;
-        this.countId = 0;
-    }
 
     public Film getFilm(Integer id) {
         log.debug(String.format("Выдача фильма с id = %d", id));
@@ -77,7 +72,7 @@ public class FilmService {
     }
 
     public void removeLike(Integer id, Integer userId) {
-        log.debug(String.format("Уаление лайка с id = %d от пользователя с id = %d", id, userId));
+        log.debug(String.format("Уаление лайка у фильма с id = %d от пользователя с id = %d", id, userId));
         isFilmContains(id);
         userService.isContainsUser(userId);
         filmStorage.get(id).getLikes().remove(userId);

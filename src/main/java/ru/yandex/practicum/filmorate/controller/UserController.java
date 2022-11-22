@@ -3,9 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -36,16 +34,14 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        validateUser(bindingResult);
+    public User addUser(@RequestBody @Valid User user) {
         User saveUser = service.addUser(user);
         log.debug(String.format("Новый пользователь был добавлен. Выданный id = %d", saveUser.getId()));
         return saveUser;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        validateUser(bindingResult);
+    public User updateUser(@RequestBody @Valid User user) {
         User saveUser = service.updateUser(user);
         log.debug(String.format("Пользователь с id = %d был обновлен", saveUser.getId()));
         return saveUser;
@@ -75,28 +71,5 @@ public class UserController {
         List<User> common = service.getCommonFriend(id, otherId);
         log.debug(String.format("Список общих друзей id  = %d c otherId = %d был выдан", id, otherId));
         return common;
-    }
-
-    //Для подробной записи ошибок в лог
-    private void validateUser(BindingResult bindingResult) {
-        String errorMessage;
-
-        if (bindingResult.hasFieldErrors("email")) {
-            errorMessage = "Ошибка валидации данных пользователя. Неверный email";
-            log.error(errorMessage);
-            throw new UserValidationException(errorMessage);
-        }
-
-        if (bindingResult.hasFieldErrors("birthday")) {
-            errorMessage = "Ошибка валидации данных пользователя. Дата рождения не может быть в будущем";
-            log.error(errorMessage);
-            throw new UserValidationException(errorMessage);
-        }
-
-        if (bindingResult.hasFieldErrors("login")) {
-            errorMessage = "Ошибка валидации данных пользователя. Логин не может быть пустым и содержать пробелы";
-            log.error(errorMessage);
-            throw new UserValidationException(errorMessage);
-        }
     }
 }

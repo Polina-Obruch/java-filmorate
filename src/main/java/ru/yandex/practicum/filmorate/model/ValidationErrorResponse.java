@@ -3,8 +3,12 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
+import java.util.Map;
+
 @RequiredArgsConstructor
-public class ErrorResponse {
-    private final String error;
+@Getter
+public class ValidationErrorResponse {
+    private final Map<String,String> errors;
 }
+
+
