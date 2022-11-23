@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserUpdateException;
-import ru.yandex.practicum.filmorate.exception.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -15,61 +13,63 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserService service = new UserService();
-    private int count;
+    private final UserService service;
 
     @GetMapping
     public List<User> getUsers() {
-        log.debug("Выданы все пользователи");
-        return service.getUsers();
+        //Вызов функции через создание переменной для логирования данных
+        List<User> saveUsers = service.getUsers();
+        log.debug("Список всех пользователей был выдан");
+        return saveUsers;
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Integer id) {
+        User user = service.getUser(id);
+        log.debug(String.format("Пользователь с id = %d был выдан", id));
+        return user;
     }
 
     @PostMapping
-    public User addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        validateUser(bindingResult);
-        int id = getId();
-        User saveUser = service.addUser(id, user);
-        log.debug("Новый пользователь добавлен. Выданный id = " + id);
+    public User addUser(@RequestBody @Valid User user) {
+        User saveUser = service.addUser(user);
+        log.debug(String.format("Новый пользователь был добавлен. Выданный id = %d", saveUser.getId()));
         return saveUser;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        validateUser(bindingResult);
-        int id = user.getId();
-
-        //Не отправляем данные сервису, пока не убедимся в необходимости этого
-        if (!service.isContains(id)) {
-            log.debug("Пользователь не может быть обновлен, так как отсутствует в базе данных");
-            throw new UserUpdateException();
-        }
-
-        User saveUser = service.updateUser(id, user);
-        log.debug("Пользователь с id = " + id + " был обновлен");
+    public User updateUser(@RequestBody @Valid User user) {
+        User saveUser = service.updateUser(user);
+        log.debug(String.format("Пользователь с id = %d был обновлен", saveUser.getId()));
         return saveUser;
     }
 
-    private int getId() {
-        return ++count;
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        service.addFriend(id, friendId);
+        log.debug(String.format("Пользователю с id = %d был добавлен друг с id = %d", id, friendId));
     }
 
-    //Для подробной записи ошибок в лог
-    private void validateUser(BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors("email")) {
-            log.debug("Ошибка валидации пользователя. Неверный email");
-            throw new UserValidationException();
-        }
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        service.removeFriend(id, friendId);
+        log.debug(String.format("У пользователя с id = %d был удален друг с id = %d", id, friendId));
+    }
 
-        if (bindingResult.hasFieldErrors("birthday")) {
-            log.debug("Ошибка валидации пользователя. Дата рождения не может быть в будущем");
-            throw new UserValidationException();
-        }
+    @GetMapping("{id}/friends")
+    public List<User> getAllFriend(@PathVariable Integer id) {
+        List<User> friends = service.getAllFriends(id);
+        log.debug(String.format("Пользователю с id = %d был выдан список друзей", id));
+        return friends;
+    }
 
-        if (bindingResult.hasFieldErrors("login")) {
-            log.debug("Ошибка валидации пользователя. Логин не может быть пустым и содержать пробелы");
-            throw new UserValidationException();
-        }
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriend(@PathVariable Integer id, @PathVariable Integer otherId) {
+        List<User> common = service.getCommonFriend(id, otherId);
+        log.debug(String.format("Список общих друзей id  = %d c otherId = %d был выдан", id, otherId));
+        return common;
     }
 }

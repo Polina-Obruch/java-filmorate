@@ -5,10 +5,12 @@ import ru.yandex.practicum.filmorate.validator.AfterData;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class Film {
     private Integer id;
+    private Set<Integer> likes;
 
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
