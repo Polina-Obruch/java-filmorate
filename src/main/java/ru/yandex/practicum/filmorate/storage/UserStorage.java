@@ -8,13 +8,23 @@ import java.util.List;
 
 public interface UserStorage {
 
-    void add(Integer id, User user);
+    User add(User user);
 
     void remove(Integer id);
+
+    User update(User user);
 
     User get(Integer id);
 
     List<User> getAll();
 
-    boolean isContains(Integer id);
+    void addFriend(Integer id, Integer idFriend);
+
+    void removeFriend(Integer id, Integer idFriend);
+
+    List<User> getFriends(Integer id);
+
+    List<User> getCommonFriend(Integer id, Integer idOther);
+
+    void isContains(Integer id);
 }

@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 public class ValidationErrorResponse {
-    private final Map<String,String> errors;
+    private final Map<String, String> errors;
 }
 
 
