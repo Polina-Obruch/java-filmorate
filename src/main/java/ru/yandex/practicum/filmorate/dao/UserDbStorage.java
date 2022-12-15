@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -89,7 +90,7 @@ public class UserDbStorage implements UserStorage {
         }
 
         if (users.size() != 1) {
-            throw new RuntimeException();
+            throw new CountOfResultNotExpectedException("Количество полученных юзеров не совпадает с ожидаемым");
         }
 
         return users.get(0);

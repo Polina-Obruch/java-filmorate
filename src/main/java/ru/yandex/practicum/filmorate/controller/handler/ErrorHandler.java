@@ -39,6 +39,12 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleErrorCountResult(final CountOfResultNotExpectedException exp) {
+        return new ErrorResponse(exp.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleBindException(MethodArgumentNotValidException exp) {
         //Ошибок валидации может быть несколько - возвращаем информацию по всем полям

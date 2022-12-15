@@ -18,11 +18,12 @@ import java.util.List;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
+    private final GenreService genreService;
 
 
     public Film getFilm(Integer id) {
         log.debug(String.format("Выдача фильма с id = %d", id));
-        return filmStorage.get(id);
+        return genreService.loadFilmGenre(filmStorage.get(id));
     }
 
     public Film addFilm(Film film) {
@@ -34,7 +35,9 @@ public class FilmService {
             film.setGenres(new LinkedHashSet<>());
         }
 
-        return filmStorage.add(film);
+        Film saveFilm = filmStorage.add(film);
+        genreService.setFilmGenre(saveFilm);
+        return saveFilm;
     }
 
     public Film updateFilm(Film film) {
@@ -43,8 +46,9 @@ public class FilmService {
         if (film.getGenres() == null) {
             film.setGenres(new LinkedHashSet<>());
         }
-
-        return filmStorage.update(film);
+        Film updateFilm = filmStorage.update(film);
+        genreService.setFilmGenre(updateFilm);
+        return updateFilm;
     }
 
     public void removeFilm(Integer id) {
@@ -54,7 +58,7 @@ public class FilmService {
 
     public List<Film> getFilms() {
         log.debug("Выдача списка всех фильмов");
-        return filmStorage.getAll();
+        return genreService.loadFilmsGenre(filmStorage.getAll());
     }
 
     public void addLike(Integer id, Integer idUser) {
@@ -73,7 +77,7 @@ public class FilmService {
 
     public List<Film> getPopularFilm(Integer count) {
         log.debug(String.format("Выдача списка %d популярных фильмов", count));
-        return filmStorage.getPopularFilm(count);
+        return genreService.loadFilmsGenre(filmStorage.getPopularFilm(count));
     }
 
     private void isFilmContains(Integer id) {
