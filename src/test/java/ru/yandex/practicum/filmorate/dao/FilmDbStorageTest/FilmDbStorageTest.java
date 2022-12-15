@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.dao.FilmDbStorageTest;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -28,10 +30,8 @@ import static ru.yandex.practicum.filmorate.dao.UserDbStorageTest.UserDbStorageT
 public class FilmDbStorageTest {
     private final FilmStorage filmDbStorage;
     private final UserStorage userDbStorage;
+    private final JdbcTemplate jdbcTemplate;
 
-    /*Тесты все вместе не запускаются. Удаление записей после каждого теста не помогает, так как при этом не сбрасывается
-       автогенератор первичного ключа. В отдельных классах делать каждый тест тоже не помогает.
-       Создается одна БД на все*/
 
     @BeforeEach
     public void addFilm() {
@@ -54,6 +54,70 @@ public class FilmDbStorageTest {
                         new Genre(2, "Драма")))
         );
         filmDbStorage.add(film3);
+    }
+
+    @AfterEach
+    public void clearDB() {
+        System.out.println("Удаляем данные");
+        String sqlQuery = "DROP TABLE FRIENDS ";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "DROP TABLE FILMS_LIKES";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "DROP TABLE FILMS_GENRE ";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "DROP TABLE USERS ";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "DROP TABLE FILMS ";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "create table IF NOT EXISTS USERS (" +
+                "    USER_ID    INTEGER AUTO_INCREMENT," +
+                "    USER_EMAIL VARCHAR not null," +
+                "    USER_NAME  VARCHAR not null," +
+                "    USER_LOGIN VARCHAR not null," +
+                "    BIRTHDAY   DATE    not null," +
+                "    constraint USERS_PK primary key (USER_ID));" ;
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "create table IF NOT EXISTS FILMS(" +
+                "    FILM_ID          INTEGER AUTO_INCREMENT," +
+                "    FILM_NAME        VARCHAR      not null," +
+                "    FILM_DESCRIPTION VARCHAR(200) not null," +
+                "    RELEASE_DATE     DATE         not null," +
+                "    DURATION         INTEGER      not null," +
+                "    MPA_ID           INTEGER      not null," +
+                "    LIKES            INTEGER DEFAULT 0," +
+                "    constraint FILMS_PK primary key (FILM_ID)," +
+                "    constraint FILMS_MPA_null_fk foreign key (MPA_ID) references MPA);";
+        jdbcTemplate.update(sqlQuery);
+
+
+        sqlQuery = "create table IF NOT EXISTS FILMS_LIKES( " +
+                "FILM_ID INTEGER not null," +
+                "USER_ID INTEGER not null," +
+                "constraint uq_likes UNIQUE (FILM_ID, USER_ID)," +
+                "constraint FILMS_LIKES_fk foreign key (FILM_ID) references FILMS ON DELETE CASCADE," +
+                "constraint FILMS_LIKES_USER_fk foreign key (USER_ID) references USERS ON DELETE CASCADE);";
+        jdbcTemplate.update(sqlQuery);
+
+
+        sqlQuery = "create table IF NOT EXISTS FRIENDS( " +
+                "USER_ID   INTEGER not null," +
+                "FRIEND_ID INTEGER not null," +
+                "constraint USER_FRIENDS_fk foreign key (USER_ID) references USERS ON DELETE CASCADE," +
+                "constraint FRIEND_USER_fk  foreign key (FRIEND_ID) references USERS (USER_ID) ON DELETE CASCADE);";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "create table IF NOT EXISTS FILMS_GENRE(" +
+                "    FILM_ID  INTEGER not null," +
+                "    GENRE_ID INTEGER not null," +
+                "    constraint FILMS_GENRE_fk foreign key (FILM_ID) references FILMS ON DELETE CASCADE," +
+                "    constraint FILMS_GENRE_GENRE_null_fk foreign key (GENRE_ID) references GENRE ON DELETE CASCADE);";
+        jdbcTemplate.update(sqlQuery);
     }
 
     @Test

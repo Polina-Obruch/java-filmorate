@@ -26,9 +26,6 @@ public class UserDbStorageTest {
     private final UserStorage userDbStorage;
     private final JdbcTemplate jdbcTemplate;
 
-    /*Тесты все вместе не запускаются. Удаление записей после каждого теста не помогает, так как при этом не сбрасывается
-        автогенератор первичного ключа. В отдельных классах делать каждый тест тоже не помогает.
-        Создается одна БД на все*/
 
     @BeforeEach
     public void addUser() {
@@ -40,7 +37,40 @@ public class UserDbStorageTest {
     @AfterEach
     public void clearDB() {
         System.out.println("Удаляем данные");
-        String sqlQuery = "DELETE FROM USERS ";
+        String sqlQuery = "DROP TABLE FRIENDS ";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "DROP TABLE FILMS_LIKES";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "DROP TABLE USERS ";
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "create table IF NOT EXISTS USERS (" +
+                "    USER_ID    INTEGER AUTO_INCREMENT," +
+                "    USER_EMAIL VARCHAR not null," +
+                "    USER_NAME  VARCHAR not null," +
+                "    USER_LOGIN VARCHAR not null," +
+                "    BIRTHDAY   DATE    not null," +
+                "    constraint USERS_PK primary key (USER_ID));" ;
+
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "create table IF NOT EXISTS FILMS_LIKES( " +
+                "FILM_ID INTEGER not null," +
+                "USER_ID INTEGER not null," +
+                "constraint uq_likes UNIQUE (FILM_ID, USER_ID)," +
+        "constraint FILMS_LIKES_fk foreign key (FILM_ID) references FILMS ON DELETE CASCADE," +
+        "constraint FILMS_LIKES_USER_fk foreign key (USER_ID) references USERS ON DELETE CASCADE);";
+
+        jdbcTemplate.update(sqlQuery);
+
+        sqlQuery = "create table IF NOT EXISTS FRIENDS( " +
+                "USER_ID   INTEGER not null," +
+                "FRIEND_ID INTEGER not null," +
+                "constraint USER_FRIENDS_fk foreign key (USER_ID) references USERS ON DELETE CASCADE," +
+                "constraint FRIEND_USER_fk  foreign key (FRIEND_ID) references USERS (USER_ID) ON DELETE CASCADE);";
+
         jdbcTemplate.update(sqlQuery);
     }
 
