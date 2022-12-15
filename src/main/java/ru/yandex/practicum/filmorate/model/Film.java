@@ -10,11 +10,13 @@ import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
 public class Film {
     private Integer id;
+    private Set<Integer> likes;
 
     @JsonIgnore
     private Integer likes;

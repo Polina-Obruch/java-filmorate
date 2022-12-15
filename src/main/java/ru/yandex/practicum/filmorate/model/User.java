@@ -12,6 +12,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class User {
     private Integer id;
+    private Set<Integer> friends;
 
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Email введен с ошибкой")
