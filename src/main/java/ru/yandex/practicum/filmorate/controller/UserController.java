@@ -40,6 +40,12 @@ public class UserController {
         return saveUser;
     }
 
+    @DeleteMapping("/{id}")
+    public void removeUser(@PathVariable Integer id) {
+        service.removeUser(id);
+        log.debug(String.format("Пользователь с id =%d удален", id));
+    }
+
     @PutMapping
     public User updateUser(@RequestBody @Valid User user) {
         User saveUser = service.updateUser(user);
@@ -60,15 +66,15 @@ public class UserController {
     }
 
     @GetMapping("{id}/friends")
-    public List<User> getAllFriend(@PathVariable Integer id) {
-        List<User> friends = service.getAllFriends(id);
+    public List<User> getFriends(@PathVariable Integer id) {
+        List<User> friends = service.getFriends(id);
         log.debug(String.format("Пользователю с id = %d был выдан список друзей", id));
         return friends;
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonFriend(@PathVariable Integer id, @PathVariable Integer otherId) {
-        List<User> common = service.getCommonFriend(id, otherId);
+    public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+        List<User> common = service.getCommonFriends(id, otherId);
         log.debug(String.format("Список общих друзей id  = %d c otherId = %d был выдан", id, otherId));
         return common;
     }

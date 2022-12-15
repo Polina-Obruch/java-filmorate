@@ -5,13 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -19,44 +17,39 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
-    private Integer countId = 0;
     private final UserService userService;
 
 
     public Film getFilm(Integer id) {
         log.debug(String.format("Выдача фильма с id = %d", id));
-        isFilmContains(id);
         return filmStorage.get(id);
     }
 
     public Film addFilm(Film film) {
-        Integer id = getId();
-        log.debug(String.format("Сохранение фильма с id = %d", id));
+        log.debug("Сохранение фильма");
 
-        film.setId(id);
-
-        //Если придет фильм без поля likes - инициализируем пустым списком
+        //Если придет фильм без поля genres - инициализируем пустым списком
         // для искл. ошибки NullPointerException при обращении к этому полю
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
+        if (film.getGenres() == null) {
+            film.setGenres(new LinkedHashSet<>());
         }
 
-        filmStorage.add(id, film);
-        return film;
+        return filmStorage.add(film);
     }
 
     public Film updateFilm(Film film) {
-        Integer id = film.getId();
+        log.debug(String.format("Обновление фильма с id = %d", film.getId()));
 
-        log.debug(String.format("Обновление фильма с id = %d", id));
-        isFilmContains(id);
-
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
+        if (film.getGenres() == null) {
+            film.setGenres(new LinkedHashSet<>());
         }
 
-        filmStorage.add(id, film);
-        return film;
+        return filmStorage.update(film);
+    }
+
+    public void removeFilm(Integer id) {
+        log.debug(String.format("Удаляем фильм с id =%d", id));
+        filmStorage.remove(id);
     }
 
     public List<Film> getFilms() {
@@ -64,36 +57,26 @@ public class FilmService {
         return filmStorage.getAll();
     }
 
-    public void addLike(Integer id, Integer userId) {
-        log.debug(String.format("Добавление лайка фильму с id = %d от пользователя с id = %d", id, userId));
+    public void addLike(Integer id, Integer idUser) {
+        log.debug(String.format("Добавление лайка фильму с id = %d от пользователя с id = %d", id, idUser));
         isFilmContains(id);
-        userService.isContainsUser(userId);
-        filmStorage.get(id).getLikes().add(userId);
+        userService.isContainsUser(idUser);
+        filmStorage.addLike(id, idUser);
     }
 
-    public void removeLike(Integer id, Integer userId) {
-        log.debug(String.format("Уаление лайка у фильма с id = %d от пользователя с id = %d", id, userId));
+    public void removeLike(Integer id, Integer idUser) {
+        log.debug(String.format("Уаление лайка у фильма с id = %d от пользователя с id = %d", id, idUser));
         isFilmContains(id);
-        userService.isContainsUser(userId);
-        filmStorage.get(id).getLikes().remove(userId);
+        userService.isContainsUser(idUser);
+        filmStorage.removeLike(id, idUser);
     }
 
     public List<Film> getPopularFilm(Integer count) {
         log.debug(String.format("Выдача списка %d популярных фильмов", count));
-        return filmStorage.getAll().stream()
-                .sorted((film1, film2) -> film2.getLikes().size() - film1.getLikes().size())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilm(count);
     }
 
     private void isFilmContains(Integer id) {
-        if (!filmStorage.isContains(id)) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
-        }
-    }
-
-    private Integer getId() {
-        return ++countId;
+        filmStorage.isContains(id);
     }
 }
