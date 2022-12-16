@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
 import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
@@ -31,7 +32,7 @@ public class MpaDbStorage {
         }
 
         if (mpa.size() != 1) {
-            throw new RuntimeException();
+            throw new CountOfResultNotExpectedException("Количество полученных MPA не совпадает с ожидаемым");
         }
 
         return mpa.get(0);

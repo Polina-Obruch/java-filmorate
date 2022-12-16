@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -42,7 +43,7 @@ public class GenreDbStorage {
         }
 
         if (genre.size() != 1) {
-            throw new RuntimeException();
+            throw new CountOfResultNotExpectedException("Количество полученных GENRE не совпадает с ожидаемым");
         }
 
         return genre.get(0);
