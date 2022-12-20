@@ -18,9 +18,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 @Slf4j
@@ -87,10 +85,10 @@ public class FilmDbStorage implements FilmStorage {
         int id = film.getId();
 
         final String sqlQuery = "UPDATE FILMS SET " +
-                "film_id = ?, film_name = ?, film_description = ?, release_date = ?, duration = ?, mpa_id = ?" +
+                "film_name = ?, film_description = ?, release_date = ?, duration = ?, mpa_id = ?" +
                 "WHERE FILM_ID = ? ";
 
-        int result = jdbcTemplate.update(sqlQuery, id, film.getName(), film.getDescription(),
+        int result = jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), id);
 
         if (result == 0) {
