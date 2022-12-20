@@ -84,7 +84,7 @@ public class FilmService {
         log.debug(String.format("Выдача списка общих фильмов у пользователей с id %d и %d", userId, friendId));
         userService.isContainsUser(userId);
         userService.isContainsUser(friendId);
-        return filmStorage.getCommonFilms(userId, friendId);
+        return genreService.loadFilmsGenre(filmStorage.getCommonFilms(userId, friendId));
     }
 
     private void isFilmContains(Integer id) {
