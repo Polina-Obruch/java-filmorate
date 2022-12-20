@@ -3,11 +3,7 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -15,7 +11,6 @@ import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -23,8 +18,9 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -158,10 +154,28 @@ public class FilmDbStorage implements FilmStorage {
         final String sqlQuery = "SELECT* " +
                 "FROM FILMS " +
                 "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
-                "ORDER BY LIKES DESC, FILM_ID ASC " +
+                "ORDER BY LIKES DESC, FILM_ID " +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, count);
+    }
+
+    @Override
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        log.debug("Запрос к БД на фильмы конкретного режиссёра");
+        String sortingCriteria = "";
+        if (sortBy.equals("year")){
+            sortingCriteria = "ORDER BY RELEASE_DATE, FILMS.FILM_ID";
+        } else if (sortBy.equals("likes")){
+            sortingCriteria = "ORDER BY LIKES DESC, FILMS.FILM_ID";
+        }
+        //При одинаковом количестве лайков или равндом годе выдаем в порядке ASC id
+        final String sqlQuery = "SELECT * FROM FILMS " +
+                "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
+                "JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                "WHERE FD.DIRECTOR_ID = ? " +
+                sortingCriteria;
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, directorId);
     }
 
     private static Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
@@ -172,6 +186,7 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
                 new Mpa(rs.getInt("MPA_ID"), rs.getString("MPA_NAME")),
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
     }
@@ -184,6 +199,7 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
                 new Mpa(),
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
     }

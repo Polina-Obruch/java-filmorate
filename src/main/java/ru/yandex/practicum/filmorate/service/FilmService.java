@@ -19,24 +19,30 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final GenreService genreService;
+    private final DirectorService directorService;
 
 
     public Film getFilm(Integer id) {
         log.debug(String.format("Выдача фильма с id = %d", id));
-        return genreService.loadFilmGenre(filmStorage.get(id));
+        Film film = genreService.loadFilmGenre(filmStorage.get(id));
+        return directorService.loadFilmDirector(film);
     }
 
     public Film addFilm(Film film) {
         log.debug("Сохранение фильма");
 
-        //Если придет фильм без поля genres - инициализируем пустым списком
-        // для искл. ошибки NullPointerException при обращении к этому полю
+        //Если придет фильм без поля genres или directors - инициализируем пустым списком
+        // для искл. ошибки NullPointerException при обращении к этим полям
         if (film.getGenres() == null) {
             film.setGenres(new LinkedHashSet<>());
+        }
+        if (film.getDirectors() == null){
+            film.setDirectors(new LinkedHashSet<>());
         }
 
         Film saveFilm = filmStorage.add(film);
         genreService.setFilmGenre(saveFilm);
+        directorService.setFilmDirector(saveFilm);
         return saveFilm;
     }
 
@@ -46,8 +52,13 @@ public class FilmService {
         if (film.getGenres() == null) {
             film.setGenres(new LinkedHashSet<>());
         }
+        if (film.getDirectors() == null){
+            film.setDirectors(new LinkedHashSet<>());
+        }
+
         Film updateFilm = filmStorage.update(film);
         genreService.setFilmGenre(updateFilm);
+        directorService.setFilmDirector(updateFilm);
         return updateFilm;
     }
 
@@ -58,7 +69,8 @@ public class FilmService {
 
     public List<Film> getFilms() {
         log.debug("Выдача списка всех фильмов");
-        return genreService.loadFilmsGenre(filmStorage.getAll());
+        List<Film> films = genreService.loadFilmsGenre(filmStorage.getAll());
+        return directorService.loadFilmsDirector(films);
     }
 
     public void addLike(Integer id, Integer idUser) {
@@ -78,6 +90,12 @@ public class FilmService {
     public List<Film> getPopularFilm(Integer count) {
         log.debug(String.format("Выдача списка %d популярных фильмов", count));
         return genreService.loadFilmsGenre(filmStorage.getPopularFilm(count));
+    }
+
+    public List<Film> getDirectorFilm(int directorId, String sortBy) {
+        log.debug(String.format("Выдача списка фильмов режиссёра %d отсортированных по критерию %s", directorId, sortBy));
+        List<Film> films = genreService.loadFilmsGenre(filmStorage.getFilmsByDirector(directorId, sortBy.toLowerCase()));
+        return directorService.loadFilmsDirector(films);
     }
 
     private void isFilmContains(Integer id) {
