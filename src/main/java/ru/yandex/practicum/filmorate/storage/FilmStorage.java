@@ -25,5 +25,7 @@ public interface FilmStorage {
 
     List<Film> getPopularFilm(Integer count);
 
+    List<Film> getCommonFilms(Integer userId, Integer friendId);
+
     void isContains(Integer id);
 }

@@ -69,7 +69,7 @@ public class FilmService {
     }
 
     public void removeLike(Integer id, Integer idUser) {
-        log.debug(String.format("Уаление лайка у фильма с id = %d от пользователя с id = %d", id, idUser));
+        log.debug(String.format("Удаление лайка у фильма с id = %d от пользователя с id = %d", id, idUser));
         isFilmContains(id);
         userService.isContainsUser(idUser);
         filmStorage.removeLike(id, idUser);
@@ -78,6 +78,13 @@ public class FilmService {
     public List<Film> getPopularFilm(Integer count) {
         log.debug(String.format("Выдача списка %d популярных фильмов", count));
         return genreService.loadFilmsGenre(filmStorage.getPopularFilm(count));
+    }
+
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        log.debug(String.format("Выдача списка общих фильмов у пользователей с id %d и %d", userId, friendId));
+        userService.isContainsUser(userId);
+        userService.isContainsUser(friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 
     private void isFilmContains(Integer id) {
