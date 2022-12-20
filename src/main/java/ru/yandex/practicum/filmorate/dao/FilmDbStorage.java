@@ -3,11 +3,7 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -15,7 +11,6 @@ import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -24,7 +19,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -91,10 +85,10 @@ public class FilmDbStorage implements FilmStorage {
         int id = film.getId();
 
         final String sqlQuery = "UPDATE FILMS SET " +
-                "film_id = ?, film_name = ?, film_description = ?, release_date = ?, duration = ?, mpa_id = ?" +
+                "film_name = ?, film_description = ?, release_date = ?, duration = ?, mpa_id = ?" +
                 "WHERE FILM_ID = ? ";
 
-        int result = jdbcTemplate.update(sqlQuery, id, film.getName(), film.getDescription(),
+        int result = jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), id);
 
         if (result == 0) {
