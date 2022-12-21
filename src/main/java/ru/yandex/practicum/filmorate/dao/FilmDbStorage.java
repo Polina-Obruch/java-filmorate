@@ -152,10 +152,28 @@ public class FilmDbStorage implements FilmStorage {
         final String sqlQuery = "SELECT* " +
                 "FROM FILMS " +
                 "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
-                "ORDER BY LIKES DESC, FILM_ID ASC " +
+                "ORDER BY LIKES DESC, FILM_ID " +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, count);
+    }
+
+    @Override
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        log.debug("Запрос к БД на фильмы конкретного режиссёра");
+        String sortingCriteria = "";
+        if (sortBy.equals("year")){
+            sortingCriteria = "ORDER BY RELEASE_DATE, FILMS.FILM_ID";
+        } else if (sortBy.equals("likes")){
+            sortingCriteria = "ORDER BY LIKES DESC, FILMS.FILM_ID";
+        }
+        //При одинаковом количестве лайков или равндом годе выдаем в порядке ASC id
+        final String sqlQuery = "SELECT * FROM FILMS " +
+                "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
+                "JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                "WHERE FD.DIRECTOR_ID = ? " +
+                sortingCriteria;
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, directorId);
     }
 
     private static Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
@@ -166,6 +184,7 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
                 new Mpa(rs.getInt("MPA_ID"), rs.getString("MPA_NAME")),
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
     }
@@ -178,6 +197,7 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
                 new Mpa(),
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
     }

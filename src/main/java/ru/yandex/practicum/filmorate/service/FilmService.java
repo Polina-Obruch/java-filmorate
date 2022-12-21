@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -19,36 +20,47 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final GenreService genreService;
+    private final DirectorService directorService;
 
 
     public Film getFilm(Integer id) {
         log.debug(String.format("Выдача фильма с id = %d", id));
-        return genreService.loadFilmGenre(filmStorage.get(id));
+        Film film = genreService.loadFilmGenre(filmStorage.get(id));
+        return directorService.loadFilmDirector(film);
     }
 
     public Film addFilm(Film film) {
         log.debug("Сохранение фильма");
 
-        //Если придет фильм без поля genres - инициализируем пустым списком
-        // для искл. ошибки NullPointerException при обращении к этому полю
-        if (film.getGenres() == null) {
-            film.setGenres(new LinkedHashSet<>());
-        }
-
+        //Если придет фильм без поля genres или directors - инициализируем пустым списком
+        // для искл. ошибки NullPointerException при обращении к этим полям
+        genreAndDirectorCheck(film);
         Film saveFilm = filmStorage.add(film);
         genreService.setFilmGenre(saveFilm);
+        directorService.setFilmDirector(saveFilm);
         return saveFilm;
     }
 
     public Film updateFilm(Film film) {
         log.debug(String.format("Обновление фильма с id = %d", film.getId()));
 
+        genreAndDirectorCheck(film);
+        Film updateFilm = filmStorage.update(film);
+        genreService.setFilmGenre(updateFilm);
+        directorService.setFilmDirector(updateFilm);
+        return updateFilm;
+    }
+
+    private void genreAndDirectorCheck(Film film) {
         if (film.getGenres() == null) {
             film.setGenres(new LinkedHashSet<>());
         }
-        Film updateFilm = filmStorage.update(film);
-        genreService.setFilmGenre(updateFilm);
-        return updateFilm;
+        if (film.getDirectors() == null){
+            film.setDirectors(new LinkedHashSet<>());
+        }
+        for (Director d: film.getDirectors()){
+            isDirectorContains(d.getId());
+        }
     }
 
     public void removeFilm(Integer id) {
@@ -58,7 +70,8 @@ public class FilmService {
 
     public List<Film> getFilms() {
         log.debug("Выдача списка всех фильмов");
-        return genreService.loadFilmsGenre(filmStorage.getAll());
+        List<Film> films = genreService.loadFilmsGenre(filmStorage.getAll());
+        return directorService.loadFilmsDirector(films);
     }
 
     public void addLike(Integer id, Integer idUser) {
@@ -80,7 +93,18 @@ public class FilmService {
         return genreService.loadFilmsGenre(filmStorage.getPopularFilm(count));
     }
 
+    public List<Film> getDirectorFilm(int directorId, String sortBy) {
+        isDirectorContains(directorId);
+        log.debug(String.format("Выдача списка фильмов режиссёра %d отсортированных по критерию %s", directorId, sortBy));
+        List<Film> films = genreService.loadFilmsGenre(filmStorage.getFilmsByDirector(directorId, sortBy.toLowerCase()));
+        return directorService.loadFilmsDirector(films);
+    }
+
     private void isFilmContains(Integer id) {
         filmStorage.isContains(id);
+    }
+
+    private void isDirectorContains(Integer id) {
+        directorService.isContains(id);
     }
 }

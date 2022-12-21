@@ -35,8 +35,10 @@ public class Film {
 
     private Mpa mpa;
     private LinkedHashSet<Genre> genres;
+    private LinkedHashSet<Director> directors;
 
-    public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Mpa mpa, LinkedHashSet<Genre> genres) {
+    public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Mpa mpa,
+                LinkedHashSet<Genre> genres, LinkedHashSet<Director> directors) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -44,5 +46,6 @@ public class Film {
         this.duration = duration;
         this.mpa = mpa;
         this.genres = genres;
+        this.directors = directors;
     }
 }

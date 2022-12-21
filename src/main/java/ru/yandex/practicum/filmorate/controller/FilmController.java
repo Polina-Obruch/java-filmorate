@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -71,6 +72,20 @@ public class FilmController {
         }
         List<Film> films = service.getPopularFilm(count);
         log.debug(String.format("Был выдан список %d популярных фильмов", count));
+        return films;
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorFilm(@PathVariable Integer directorId,
+            @RequestParam(defaultValue = "year", required = false) String sortBy) {
+        if (!(sortBy.equals("year".toLowerCase()) || sortBy.equals("likes".toLowerCase()))) {
+            throw new IncorrectParameterException("Значение параметра sortBy должно быть \"year\" или \"likes\"");
+        }
+        List<Film> films = service.getDirectorFilm(directorId, sortBy);
+        if (films.size() == 0){
+            throw new FilmNotFoundException("Фильмов от этого режиссёра не найдено.");
+        }
+        log.debug(String.format("Был выдан список режиссёра %d, отсортированный по значению %s", directorId, sortBy));
         return films;
     }
 }

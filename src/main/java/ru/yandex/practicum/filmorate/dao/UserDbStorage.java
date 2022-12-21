@@ -69,7 +69,7 @@ public class UserDbStorage implements UserStorage {
                 user.getLogin(), user.getBirthday(), id);
 
         if (result == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
+            log.debug(String.format("Пользователь с id = %d не был найден в базе", id));
             throw new UserNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
         return user;
