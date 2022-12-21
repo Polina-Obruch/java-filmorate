@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class DirectorService {
     public Director updateDirector(Director director) {
         Integer id = director.getId();
         log.debug(String.format("Обновление режиссёра c id = %d", id));
-        return directorStorage.redactDirector(director);
+        return directorStorage.updateDirector(director);
     }
 
     public void setFilmDirector(Film film) {
@@ -61,6 +60,10 @@ public class DirectorService {
             return films;
         }
         return directorStorage.loadFilmsDirector(films);
+    }
+
+    public void isContains(Integer id){
+        directorStorage.isContains(id);
     }
 
 }

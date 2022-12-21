@@ -13,7 +13,7 @@ public interface DirectorStorage {
 
     Director createDirector(Director director);
 
-    Director redactDirector(Director director);
+    Director updateDirector(Director director);
 
     void removeDirector(int id);
 
@@ -22,5 +22,7 @@ public interface DirectorStorage {
     Film loadFilmDirector(Film film);
 
     List<Film> loadFilmsDirector(List<Film> film);
+
+    void isContains(Integer id);
 
 }

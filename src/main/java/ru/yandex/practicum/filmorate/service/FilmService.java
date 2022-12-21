@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -33,13 +34,7 @@ public class FilmService {
 
         //Если придет фильм без поля genres или directors - инициализируем пустым списком
         // для искл. ошибки NullPointerException при обращении к этим полям
-        if (film.getGenres() == null) {
-            film.setGenres(new LinkedHashSet<>());
-        }
-        if (film.getDirectors() == null){
-            film.setDirectors(new LinkedHashSet<>());
-        }
-
+        genreAndDirectorCheck(film);
         Film saveFilm = filmStorage.add(film);
         genreService.setFilmGenre(saveFilm);
         directorService.setFilmDirector(saveFilm);
@@ -49,17 +44,23 @@ public class FilmService {
     public Film updateFilm(Film film) {
         log.debug(String.format("Обновление фильма с id = %d", film.getId()));
 
+        genreAndDirectorCheck(film);
+        Film updateFilm = filmStorage.update(film);
+        genreService.setFilmGenre(updateFilm);
+        directorService.setFilmDirector(updateFilm);
+        return updateFilm;
+    }
+
+    private void genreAndDirectorCheck(Film film) {
         if (film.getGenres() == null) {
             film.setGenres(new LinkedHashSet<>());
         }
         if (film.getDirectors() == null){
             film.setDirectors(new LinkedHashSet<>());
         }
-
-        Film updateFilm = filmStorage.update(film);
-        genreService.setFilmGenre(updateFilm);
-        directorService.setFilmDirector(updateFilm);
-        return updateFilm;
+        for (Director d: film.getDirectors()){
+            isDirectorContains(d.getId());
+        }
     }
 
     public void removeFilm(Integer id) {
@@ -93,6 +94,7 @@ public class FilmService {
     }
 
     public List<Film> getDirectorFilm(int directorId, String sortBy) {
+        isDirectorContains(directorId);
         log.debug(String.format("Выдача списка фильмов режиссёра %d отсортированных по критерию %s", directorId, sortBy));
         List<Film> films = genreService.loadFilmsGenre(filmStorage.getFilmsByDirector(directorId, sortBy.toLowerCase()));
         return directorService.loadFilmsDirector(films);
@@ -100,5 +102,9 @@ public class FilmService {
 
     private void isFilmContains(Integer id) {
         filmStorage.isContains(id);
+    }
+
+    private void isDirectorContains(Integer id) {
+        directorService.isContains(id);
     }
 }
