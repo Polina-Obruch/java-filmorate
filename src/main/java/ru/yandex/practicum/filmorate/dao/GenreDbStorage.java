@@ -16,10 +16,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -114,10 +111,10 @@ public class GenreDbStorage {
     public List<Film> loadFilmsGenre(List<Film> films) {
         log.debug("Запрос к БД на загрузку жанров для нескольких фильмов");
         List<Integer> ids = films.stream().map(Film::getId).collect(Collectors.toList());
-
-        Map<Integer, Film> filmMap = films.stream().collect
-                (Collectors.toMap(Film::getId, film -> film));
-
+        Map<Integer, Film> filmMap = new LinkedHashMap<>();
+        for (Film f: films){
+            filmMap.put(f.getId(),f);
+        }
         SqlParameterSource parameters = new MapSqlParameterSource("ids", ids);
         NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 

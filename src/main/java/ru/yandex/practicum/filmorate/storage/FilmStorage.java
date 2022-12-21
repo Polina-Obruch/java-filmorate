@@ -25,5 +25,7 @@ public interface FilmStorage {
 
     List<Film> getPopularFilm(Integer count);
 
+    List<Film> getFilmsByDirector(Integer directorId, String sortBy);
+
     void isContains(Integer id);
 }

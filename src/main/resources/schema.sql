@@ -71,6 +71,24 @@ create table IF NOT EXISTS FRIENDS
         foreign key (FRIEND_ID) references USERS (USER_ID) ON DELETE CASCADE
 );
 
+create table IF NOT EXISTS DIRECTORS
+(
+    DIRECTOR_ID    INTEGER AUTO_INCREMENT,
+    DIRECTOR_NAME  VARCHAR not null,
+    constraint DIRECTORS_PK
+        primary key (DIRECTOR_ID)
+);
+
+create table IF NOT EXISTS FILMS_DIRECTORS
+(
+    FILM_ID  INTEGER not null,
+    DIRECTOR_ID INTEGER not null,
+    constraint "FILMS_ID_fk"
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
+    constraint "DIRECTORS_fk"
+        foreign key (DIRECTOR_ID) references DIRECTORS ON DELETE CASCADE
+);
+
 create table IF NOT EXISTS REVIEWS
 (
     REVIEW_ID       INTEGER AUTO_INCREMENT,
