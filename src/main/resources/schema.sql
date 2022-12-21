@@ -70,3 +70,19 @@ create table IF NOT EXISTS FRIENDS
     constraint "FRIEND_USER_fk"
         foreign key (FRIEND_ID) references USERS (USER_ID) ON DELETE CASCADE
 );
+
+create table IF NOT EXISTS REVIEWS
+(
+    REVIEW_ID       INTEGER AUTO_INCREMENT,
+    CONTENT          VARCHAR      not null,
+    IS_POSITIVE      BOOLEAN      not null,
+    USER_ID          INTEGER      not null,
+    FILM_ID          INTEGER      not null,
+    USEFUL           INTEGER DEFAULT 0,
+    constraint REVIEWS_PK
+        primary key (REVIEW_ID),
+    constraint "REVIEWS_USERS_fk"
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
+    constraint "REVIEWS_FILMS_fk"
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE
+);

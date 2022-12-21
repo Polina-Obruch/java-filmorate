@@ -80,7 +80,7 @@ public class FilmService {
         return genreService.loadFilmsGenre(filmStorage.getPopularFilm(count));
     }
 
-    private void isFilmContains(Integer id) {
+    public void isFilmContains(Integer id) {
         filmStorage.isContains(id);
     }
 }
