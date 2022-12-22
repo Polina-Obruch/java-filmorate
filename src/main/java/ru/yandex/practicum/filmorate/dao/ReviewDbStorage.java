@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
 import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,7 +22,7 @@ import java.util.Objects;
 @Slf4j
 @AllArgsConstructor
 @Repository
-public class ReviewDbStorage {
+public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public Review add(Review review) {

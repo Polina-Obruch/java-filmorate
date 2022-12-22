@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Service
 public class ReviewService {
-    ReviewDbStorage reviewStorage;
+    ReviewStorage reviewStorage;
     FilmService filmService;
     UserService userService;
 
