@@ -27,15 +27,7 @@ public class Review {
     private Integer filmId;
     private Integer useful;
 
-    @Override
-    public String toString() {
-        return "Review{" +
-                "reviewId=" + reviewId +
-                ", content='" + content + '\'' +
-                ", isPositive=" + isPositive +
-                ", userId=" + userId +
-                ", filmId=" + filmId +
-                ", useful=" + useful +
-                '}';
+    public Review(Integer reviewId) {
+        this.reviewId = reviewId;
     }
 }
