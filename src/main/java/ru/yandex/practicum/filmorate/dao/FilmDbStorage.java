@@ -146,13 +146,29 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopularFilm(Integer count) {
+    public List<Film> getPopularFilm(Integer count, Integer genreId, Integer year) {
         log.debug("Запрос к БД на топ популярных фильмов");
         //При одинаковом количестве лайков выдаем в порядке ASC id
+        String genreFilter = "";
+        String yearFilter = "";
+        if (genreId != null){
+            genreFilter = "JOIN FILMS_GENRE FG on FILMS.FILM_ID = FG.FILM_ID " +
+                    "WHERE FG.GENRE_ID = " + genreId + " ";
+        }
+        if (year != null){
+            if (genreId != null){
+                yearFilter = "AND EXTRACT(YEAR FROM FILMS.RELEASE_DATE) = " + year + " ";
+            } else{
+                yearFilter = "WHERE EXTRACT(YEAR FROM FILMS.RELEASE_DATE) = " + year + " ";
+            }
+        }
+
         final String sqlQuery = "SELECT* " +
                 "FROM FILMS " +
                 "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
-                "ORDER BY LIKES DESC, FILM_ID " +
+                genreFilter +
+                yearFilter +
+                "ORDER BY LIKES DESC, FILMS.FILM_ID " +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, count);

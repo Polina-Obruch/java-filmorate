@@ -66,11 +66,15 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilm(@RequestParam(defaultValue = "10", required = false) Integer count) {
+    public List<Film> getPopularFilm(@RequestParam(defaultValue = "10", required = false) Integer count,
+                                     @RequestParam(required = false) Integer genreId,
+                                     @RequestParam(required = false) Integer year) {
         if (count <= 0) {
             throw new IncorrectParameterException("Значение параметра count должно быть больше нуля");
+        } else if (genreId != null && (genreId <= 0 || genreId >= 7)) {
+            throw new IncorrectParameterException("Значение параметра genreId должно быть от 1 до 6");
         }
-        List<Film> films = service.getPopularFilm(count);
+        List<Film> films = service.getPopularFilm(count, genreId, year);
         log.debug(String.format("Был выдан список %d популярных фильмов", count));
         return films;
     }
