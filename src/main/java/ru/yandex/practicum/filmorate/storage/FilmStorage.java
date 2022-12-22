@@ -28,4 +28,6 @@ public interface FilmStorage {
     List<Film> getFilmsByDirector(Integer directorId, String sortBy);
 
     void isContains(Integer id);
+
+    List<Film> getUserRecommendations(Integer id);
 }

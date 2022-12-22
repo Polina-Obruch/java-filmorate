@@ -119,4 +119,10 @@ public class FilmService {
     private void isDirectorContains(Integer id) {
         directorService.isContains(id);
     }
+
+    public List<Film> getUserRecommendations(Integer id) {
+        log.debug(String.format("выдача рекомендованных фильмов для пользователя %d", id));
+        userService.isContainsUser(id);
+        return directorService.loadFilmsDirector(genreService.loadFilmsGenre(filmStorage.getUserRecommendations(id)));
+    }
 }

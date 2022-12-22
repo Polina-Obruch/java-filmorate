@@ -4,7 +4,9 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -17,6 +19,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService service;
+    private final FilmService filmService;
 
     @GetMapping
     public List<User> getUsers() {
@@ -77,5 +80,11 @@ public class UserController {
         List<User> common = service.getCommonFriends(id, otherId);
         log.debug(String.format("Список общих друзей id  = %d c otherId = %d был выдан", id, otherId));
         return common;
+    }
+
+    @GetMapping("{id}/recommendations")
+    public List<Film> getUserRecommendations(@PathVariable Integer id) {
+        log.info(String.format("Запрос рекомендаций для пользователя id = %d", id));
+        return filmService.getUserRecommendations(id);
     }
 }

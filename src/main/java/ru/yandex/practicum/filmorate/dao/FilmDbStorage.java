@@ -233,4 +233,21 @@ public class FilmDbStorage implements FilmStorage {
             throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
     }
+
+    @Override
+    public List<Film> getUserRecommendations(Integer id) {
+        log.debug(String.format("Отправляем запрос на рекомендации для пользователя с id = %d из БД", id));
+        final String sqlQuery = "SELECT * " +
+                "FROM FILMS " +
+                "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
+                "WHERE FILM_ID IN " +
+                "( SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "EXCEPT " +
+                "SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ? )";
+
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, id);
+    }
 }
