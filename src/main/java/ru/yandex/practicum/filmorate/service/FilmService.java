@@ -88,9 +88,21 @@ public class FilmService {
         filmStorage.removeLike(id, idUser);
     }
 
-    public List<Film> getPopularFilm(Integer count) {
-        log.debug(String.format("Выдача списка %d популярных фильмов", count));
-        return genreService.loadFilmsGenre(filmStorage.getPopularFilm(count));
+    public List<Film> getPopularFilm(Integer count, Integer genreId, Integer year) {
+
+        String genreName;
+        if (year != null && genreId != null){
+            genreName = genreService.getGenre(genreId).getName();
+            log.debug(String.format("Выдача списка %d популярных фильмов в жанре %s %d года", count, genreName, year));
+        } else if (year == null && genreId != null) {
+            genreName = genreService.getGenre(genreId).getName();
+            log.debug(String.format("Выдача списка %d популярных фильмов в жанре %s", count, genreName));
+        } else if (year != null) {
+            log.debug(String.format("Выдача списка %d популярных фильмов %d года", count, year));
+        } else {
+            log.debug(String.format("Выдача списка %d популярных фильмов", count));
+        }
+        return genreService.loadFilmsGenre(filmStorage.getPopularFilm(count, genreId, year));
     }
 
     public List<Film> getDirectorFilm(int directorId, String sortBy) {
