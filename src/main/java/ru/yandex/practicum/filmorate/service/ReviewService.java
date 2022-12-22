@@ -34,17 +34,17 @@ public class ReviewService {
     }
 
     public void removeReview(Integer id) {
-        log.debug(String.format("Удаляем отзыв с id =%d", id));
+        log.debug(String.format("Удаляем отзыв с id = %d", id));
         reviewStorage.remove(id);
     }
 
     public List<Review> getAllReviews(Integer count) {
-        log.debug(String.format("Выдача списка всех отзывов с count =%d", count));
+        log.debug(String.format("Выдача списка всех отзывов с count = %d", count));
         return reviewStorage.getAllReviews(count);
     }
 
     public List<Review> getAllReviewsByFilmId(Integer filmId, Integer count) {
-        log.debug(String.format("Выдача списка отзывов для фильма с id = =%d и  count =%d", filmId, count));
+        log.debug(String.format("Выдача списка отзывов для фильма с id = %d и  count = %d", filmId, count));
         filmService.isFilmContains(filmId);
 
         return reviewStorage.getAllReviewsByFilmId(filmId, count);
