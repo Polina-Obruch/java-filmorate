@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -14,7 +14,7 @@ public class Review {
 
     private Integer reviewId;
 
-    @NotNull(message = "Отзыв не может быть пустым.")
+    @NotBlank(message = "Отзыв не может быть пустым.")
     private String content;
 
     @NotNull(message = "Тип отзыва не может быть пустым")

@@ -62,7 +62,7 @@ public class DirectorService {
         return directorStorage.loadFilmsDirector(films);
     }
 
-    public void isContains(Integer id){
+    public void isContains(Integer id) {
         directorStorage.isContains(id);
     }
 

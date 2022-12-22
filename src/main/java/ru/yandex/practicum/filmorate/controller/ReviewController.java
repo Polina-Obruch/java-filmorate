@@ -56,7 +56,7 @@ public class ReviewController {
         }
 
         if (filmId != null && filmId > 0) {
-            reviews = service.getAllReviewsByFilmId(filmId,count);
+            reviews = service.getAllReviewsByFilmId(filmId, count);
         } else if (filmId == null) {
             reviews = service.getAllReviews(count);
         } else {
@@ -69,25 +69,25 @@ public class ReviewController {
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Integer id, @PathVariable Integer userId) {
-        service.addLike(id,userId);
-        log.debug(String.format("Отзыву с id = %d был поставлен лайк", id));
+        service.addLike(id, userId);
+        log.debug(String.format("Отзыву с id = %d был поставлен лайк от пользователя с id = %d", id, userId));
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public void addDislike(@PathVariable Integer id, @PathVariable Integer userId) {
-        service.addDislike(id,userId);
-        log.debug(String.format("Отзыву с id = %d был поставлен дизлайк", id));
+        service.addDislike(id, userId);
+        log.debug(String.format("Отзыву с id = %d был поставлен дизлайк от пользователя с id = %d", id, userId));
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Integer id, @PathVariable Integer userId) {
-        service.removeLike(id,userId);
-        log.debug(String.format("У отзыва с id = %d был удален лайк", id));
+        service.removeLike(id, userId);
+        log.debug(String.format("У отзыва с id = %d был удален лайк от пользователя с id = %d", id, userId));
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void removeDislike(@PathVariable Integer id, @PathVariable Integer userId) {
         service.removeDislike(id, userId);
-        log.debug(String.format("У отзыва с id = %d был удален дизлайк", id));
+        log.debug(String.format("У отзыва с id = %d был удален дизлайк от пользователя с id = %d", id, userId));
     }
 }

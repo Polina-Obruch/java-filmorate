@@ -77,12 +77,12 @@ public class FilmController {
 
     @GetMapping("/director/{directorId}")
     public List<Film> getDirectorFilm(@PathVariable Integer directorId,
-            @RequestParam(defaultValue = "year", required = false) String sortBy) {
+                                      @RequestParam(defaultValue = "year", required = false) String sortBy) {
         if (!(sortBy.equals("year".toLowerCase()) || sortBy.equals("likes".toLowerCase()))) {
             throw new IncorrectParameterException("Значение параметра sortBy должно быть \"year\" или \"likes\"");
         }
         List<Film> films = service.getDirectorFilm(directorId, sortBy);
-        if (films.size() == 0){
+        if (films.size() == 0) {
             throw new FilmNotFoundException("Фильмов от этого режиссёра не найдено.");
         }
         log.debug(String.format("Был выдан список режиссёра %d, отсортированный по значению %s", directorId, sortBy));
