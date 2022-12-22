@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable int id) {
+    public User getUser(@PathVariable Integer id) {
         User user = service.getUser(id);
         log.debug(String.format("Пользователь с id = %d был выдан", id));
         return user;
