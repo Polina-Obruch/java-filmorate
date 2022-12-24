@@ -2,9 +2,8 @@ package ru.yandex.practicum.filmorate.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import ru.yandex.practicum.filmorate.validator.AfterData;
 
 import javax.validation.constraints.*;
@@ -12,8 +11,7 @@ import java.time.LocalDate;
 import java.util.LinkedHashSet;
 
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class Film {
     private Integer id;

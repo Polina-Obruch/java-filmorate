@@ -250,4 +250,26 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, id);
     }
+
+    @Override
+    public List<Film> getSearchedFilmsByDirector(String query) {
+        log.debug("Отправляем запрос на поиск фильмов по режиссеру");
+        final String sqlQuery = "SELECT * " +
+                "FROM FILMS " +
+                "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                "JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                "JOIN DIRECTORS ON FD.DIRECTOR_ID = DIRECTORS.DIRECTOR_ID " +
+                "WHERE LOWER(DIRECTORS.DIRECTOR_NAME) LIKE LOWER(?)";
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, "%" + query + "%");
+    }
+
+    @Override
+    public List<Film> getSearchedFilmsByTitle(String query) {
+        log.debug("Отправляем запрос на поиск фильмов по названию");
+        final String sqlQuery = "SELECT * " +
+                "FROM FILMS " +
+                "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                "WHERE LOWER(FILM_NAME) LIKE LOWER(?)";
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, "%" + query + "%");
+    }
 }

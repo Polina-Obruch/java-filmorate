@@ -30,4 +30,8 @@ public interface FilmStorage {
     void isContains(Integer id);
 
     List<Film> getUserRecommendations(Integer id);
+
+    List<Film> getSearchedFilmsByDirector(String query);
+
+    List<Film> getSearchedFilmsByTitle(String query);
 }

@@ -9,8 +9,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 
 @Slf4j
@@ -124,5 +123,20 @@ public class FilmService {
         log.debug(String.format("выдача рекомендованных фильмов для пользователя %d", id));
         userService.isContainsUser(id);
         return directorService.loadFilmsDirector(genreService.loadFilmsGenre(filmStorage.getUserRecommendations(id)));
+    }
+
+    public List<Film> getSearchedFilms(String query, String by) {
+        Set<Film> films = new HashSet<>();
+        if (by.contains("director")) {
+            films.addAll(filmStorage.getSearchedFilmsByDirector(query));
+        }
+        if (by.contains("title")) {
+            films.addAll(filmStorage.getSearchedFilmsByTitle(query));
+        }
+        return giveFilmsGenresAndDirector(new ArrayList<>(films));
+    }
+
+    private List<Film> giveFilmsGenresAndDirector(List<Film> films) {
+        return directorService.loadFilmsDirector(genreService.loadFilmsGenre(films));
     }
 }

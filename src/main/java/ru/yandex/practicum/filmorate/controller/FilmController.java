@@ -92,4 +92,15 @@ public class FilmController {
         log.debug(String.format("Был выдан список режиссёра %d, отсортированный по значению %s", directorId, sortBy));
         return films;
     }
+
+    @GetMapping("/search")
+    public List<Film> getSearchedFilms(@RequestParam String query, @RequestParam String by) {
+        if (by.equals("title,director") || by.equals("director")
+                || by.equals("title") || by.equals("director,title")) {
+            log.debug(String.format("Был выдан список фильмов с поиском %s по значениям %s", query, by));
+            return service.getSearchedFilms(query, by);
+        } else {
+            throw new IncorrectParameterException("Неверное введены параметры поиска");
+        }
+    }
 }
