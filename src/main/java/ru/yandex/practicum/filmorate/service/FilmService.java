@@ -55,10 +55,10 @@ public class FilmService {
         if (film.getGenres() == null) {
             film.setGenres(new LinkedHashSet<>());
         }
-        if (film.getDirectors() == null){
+        if (film.getDirectors() == null) {
             film.setDirectors(new LinkedHashSet<>());
         }
-        for (Director d: film.getDirectors()){
+        for (Director d : film.getDirectors()) {
             isDirectorContains(d.getId());
         }
     }
@@ -112,7 +112,7 @@ public class FilmService {
         return directorService.loadFilmsDirector(films);
     }
 
-    private void isFilmContains(Integer id) {
+    public void isFilmContains(Integer id) {
         filmStorage.isContains(id);
     }
 

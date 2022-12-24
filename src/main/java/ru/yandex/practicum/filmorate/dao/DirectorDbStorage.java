@@ -96,7 +96,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void removeDirector(int id){
+    public void removeDirector(int id) {
         log.debug("Запрос к БД на удаление режиссёра");
         final String sqlQuery = "DELETE FROM DIRECTORS " +
                 "WHERE DIRECTOR_ID = ?";
@@ -153,8 +153,8 @@ public class DirectorDbStorage implements DirectorStorage {
         List<Integer> ids = films.stream().map(Film::getId).collect(Collectors.toList());
 
         Map<Integer, Film> filmMap = new LinkedHashMap<>();
-        for (Film f: films){
-            filmMap.put(f.getId(),f);
+        for (Film f : films) {
+            filmMap.put(f.getId(), f);
         }
 
         SqlParameterSource parameters = new MapSqlParameterSource("ids", ids);

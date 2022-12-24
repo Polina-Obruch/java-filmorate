@@ -73,18 +73,49 @@ create table IF NOT EXISTS FRIENDS
 
 create table IF NOT EXISTS DIRECTORS
 (
-    DIRECTOR_ID    INTEGER AUTO_INCREMENT,
-    DIRECTOR_NAME  VARCHAR not null,
+    DIRECTOR_ID   INTEGER AUTO_INCREMENT,
+    DIRECTOR_NAME VARCHAR not null,
     constraint DIRECTORS_PK
         primary key (DIRECTOR_ID)
 );
 
 create table IF NOT EXISTS FILMS_DIRECTORS
 (
-    FILM_ID  INTEGER not null,
+    FILM_ID     INTEGER not null,
     DIRECTOR_ID INTEGER not null,
     constraint "FILMS_ID_fk"
         foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
     constraint "DIRECTORS_fk"
         foreign key (DIRECTOR_ID) references DIRECTORS ON DELETE CASCADE
+);
+
+create table IF NOT EXISTS REVIEWS
+(
+    REVIEW_ID   INTEGER AUTO_INCREMENT,
+    CONTENT     VARCHAR not null,
+    IS_POSITIVE BOOLEAN not null,
+    USER_ID     INTEGER not null,
+    FILM_ID     INTEGER not null,
+    USEFUL      INTEGER DEFAULT 0,
+    constraint REVIEWS_PK
+        primary key (REVIEW_ID),
+    constraint "REVIEWS_USERS_fk"
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
+    constraint "REVIEWS_FILMS_fk"
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE
+);
+
+create table IF NOT EXISTS REVIEWS_MARK
+(
+    MARK_ID   INTEGER AUTO_INCREMENT,
+    REVIEW_ID INTEGER not null,
+    USER_ID   INTEGER not null,
+    MARK      INT2    not null,
+    constraint uq_marks UNIQUE (REVIEW_ID, USER_ID),
+    constraint REVIEWS_MARK_PK
+        primary key (MARK_ID),
+    constraint "REVIEWS_MARK_USERS_fk"
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
+    constraint "REVIEWS_MARK_REVIEWS_fk"
+        foreign key (REVIEW_ID) references REVIEWS ON DELETE CASCADE
 );

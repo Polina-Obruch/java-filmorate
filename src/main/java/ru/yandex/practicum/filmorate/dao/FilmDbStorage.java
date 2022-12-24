@@ -178,9 +178,9 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
         log.debug("Запрос к БД на фильмы конкретного режиссёра");
         String sortingCriteria = "";
-        if (sortBy.equals("year")){
+        if (sortBy.equals("year")) {
             sortingCriteria = "ORDER BY RELEASE_DATE, FILMS.FILM_ID";
-        } else if (sortBy.equals("likes")){
+        } else if (sortBy.equals("likes")) {
             sortingCriteria = "ORDER BY LIKES DESC, FILMS.FILM_ID";
         }
         //При одинаковом количестве лайков или равндом годе выдаем в порядке ASC id

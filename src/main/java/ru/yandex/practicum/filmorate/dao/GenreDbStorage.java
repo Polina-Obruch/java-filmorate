@@ -112,8 +112,8 @@ public class GenreDbStorage {
         log.debug("Запрос к БД на загрузку жанров для нескольких фильмов");
         List<Integer> ids = films.stream().map(Film::getId).collect(Collectors.toList());
         Map<Integer, Film> filmMap = new LinkedHashMap<>();
-        for (Film f: films){
-            filmMap.put(f.getId(),f);
+        for (Film f : films) {
+            filmMap.put(f.getId(), f);
         }
         SqlParameterSource parameters = new MapSqlParameterSource("ids", ids);
         NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);

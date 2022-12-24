@@ -49,6 +49,37 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void remove(Integer id) {
+        //Прежде чем удалить юзера, необходимо удалить его лайки и дизлайки на отзывы/фильмы
+        //Записи в таблицах удалятся самостоятельно
+        //Но необходим перерасчет значений полей likes/useful в фильмы/отзывы
+
+        log.debug("Запрос к БД на обновление USEFUL для отзывов, которые лайкнул удаляемый пользователь");
+        final String sqlLikeQuery = "UPDATE REVIEWS SET USEFUL = REVIEWS.USEFUL - 1 " +
+                "WHERE REVIEW_ID IN " +
+                "(SELECT REVIEW_ID " +
+                "FROM REVIEWS_MARK " +
+                "WHERE USER_ID = ? AND MARK = ?)";
+
+        jdbcTemplate.update(sqlLikeQuery, id, 1);
+
+        log.debug("Запрос к БД на обновление USEFUL для отзывов, которые дизлайкнул удаляемый пользователь");
+        final String sqlDislikeQuery = "UPDATE REVIEWS SET USEFUL = REVIEWS.USEFUL + 1 " +
+                "WHERE REVIEW_ID IN " +
+                "(SELECT REVIEW_ID " +
+                "FROM REVIEWS_MARK " +
+                "WHERE USER_ID = ? AND MARK = ?)";
+
+        jdbcTemplate.update(sqlDislikeQuery, id, -1);
+
+        log.debug("Запрос к БД на обновление LIKES для фильмов, которые лайкнул удаляемый пользователь");
+        final String sqlFilmLikeQuery = "UPDATE FILMS SET LIKES = LIKES - 1 " +
+                "WHERE FILM_ID IN " +
+                "(SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ?)";
+
+        jdbcTemplate.update(sqlFilmLikeQuery, id);
+
         log.debug("Запрос к БД на удаление пользователя");
         final String sqlQuery = "DELETE FROM USERS " +
                 "WHERE USER_ID = ?";
