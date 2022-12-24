@@ -125,4 +125,11 @@ public class FilmService {
         userService.isContainsUser(id);
         return directorService.loadFilmsDirector(genreService.loadFilmsGenre(filmStorage.getUserRecommendations(id)));
     }
+
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        log.debug(String.format("Выдача списка общих фильмов у пользователей с id %d и %d", userId, friendId));
+        userService.isContainsUser(userId);
+        userService.isContainsUser(friendId);
+        return directorService.loadFilmsDirector(genreService.loadFilmsGenre(filmStorage.getCommonFilms(userId, friendId)));
+    }
 }

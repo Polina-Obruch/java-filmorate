@@ -92,4 +92,11 @@ public class FilmController {
         log.debug(String.format("Был выдан список режиссёра %d, отсортированный по значению %s", directorId, sortBy));
         return films;
     }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
+        List<Film> films = service.getCommonFilms(userId, friendId);
+        log.debug(String.format("Был выден список общих фильмов у пользователей с id %d и %d", userId, friendId));
+        return films;
+    }
 }
