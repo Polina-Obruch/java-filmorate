@@ -30,4 +30,6 @@ public interface FilmStorage {
     void isContains(Integer id);
 
     List<Film> getUserRecommendations(Integer id);
+
+    List<Film> getCommonFilms(Integer userId, Integer friendId);
 }

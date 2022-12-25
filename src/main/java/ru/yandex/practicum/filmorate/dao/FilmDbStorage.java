@@ -250,4 +250,22 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, id);
     }
+
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        log.debug("Запрос к БД на список общих фильмов у двух пользователей");
+        final String sqlQuery = "SELECT * " +
+                "FROM FILMS " +
+                "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
+                "WHERE FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ?) " +
+                "AND FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ?)" +
+                "ORDER BY LIKES DESC, FILM_ID";
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, userId, friendId);
+    }
 }
