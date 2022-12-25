@@ -75,7 +75,7 @@ public class UserService {
     }
 
     public List<Event> getUserFeed(Integer id) {
-        log.debug(String.format("Выдача лента новостей пользователя c id = %d", id));
+        log.debug(String.format("Выдача ленты новостей пользователя c id = %d", id));
         isContainsUser(id);
         return feedService.getUserFeed(id);
     }
