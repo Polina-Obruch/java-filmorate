@@ -12,7 +12,7 @@ public interface ReviewStorage {
 
     Review get(Integer id);
 
-    void remove(Integer id);
+    Integer remove(Integer id);
 
     List<Review> getAllReviews(Integer count);
 

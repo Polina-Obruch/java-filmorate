@@ -15,17 +15,22 @@ public class ReviewService {
     ReviewStorage reviewStorage;
     FilmService filmService;
     UserService userService;
+    FeedService feedService;
 
     public Review addReview(Review review) {
         log.debug("Сохранение отзыва");
         filmService.isFilmContains(review.getFilmId());
         userService.isContainsUser(review.getUserId());
-        return reviewStorage.add(review);
+        Review saveReview = reviewStorage.add(review);
+        feedService.saveEventAddReview(saveReview.getReviewId(), saveReview.getUserId());
+        return saveReview;
     }
 
     public Review updateReview(Review review) {
         log.debug(String.format("Обновление отзыва с id = %d", review.getReviewId()));
-        return reviewStorage.update(review);
+        Review saveReview = reviewStorage.update(review);
+        feedService.saveEventUpdateReview(saveReview.getReviewId(), saveReview.getUserId());
+        return saveReview;
     }
 
     public Review getReview(Integer id) {
@@ -35,7 +40,8 @@ public class ReviewService {
 
     public void removeReview(Integer id) {
         log.debug(String.format("Удаляем отзыв с id = %d", id));
-        reviewStorage.remove(id);
+        Integer userId = reviewStorage.remove(id);
+        feedService.saveEventRemoveReview(id, userId);
     }
 
     public List<Review> getAllReviews(Integer count) {

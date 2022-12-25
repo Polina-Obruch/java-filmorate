@@ -82,12 +82,21 @@ public class ReviewDbStorage implements ReviewStorage {
         return review.get(0);
     }
 
-    public void remove(Integer id) {
+    public Integer remove(Integer id) {
+        final String sqlId = "SELECT USER_ID " +
+                "FROM REVIEWS " +
+                "WHERE REVIEW_ID = ? ";
+
+        Integer user_Id = Objects.requireNonNull(jdbcTemplate.queryForObject(sqlId,
+                Integer.class, id));
+
         log.debug("Запрос к БД на удаление отзыва");
         final String sqlQuery = "DELETE FROM REVIEWS " +
                 "WHERE REVIEW_ID = ? ";
 
         jdbcTemplate.update(sqlQuery, id);
+
+        return user_Id;
     }
 
     public List<Review> getAllReviews(Integer count) {

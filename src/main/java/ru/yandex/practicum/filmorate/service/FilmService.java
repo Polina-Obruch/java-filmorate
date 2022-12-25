@@ -21,6 +21,7 @@ public class FilmService {
     private final UserService userService;
     private final GenreService genreService;
     private final DirectorService directorService;
+    private final FeedService feedService;
 
 
     public Film getFilm(Integer id) {
@@ -79,6 +80,7 @@ public class FilmService {
         isFilmContains(id);
         userService.isContainsUser(idUser);
         filmStorage.addLike(id, idUser);
+        feedService.saveEventAddLikeFilm(id, idUser);
     }
 
     public void removeLike(Integer id, Integer idUser) {
@@ -86,12 +88,13 @@ public class FilmService {
         isFilmContains(id);
         userService.isContainsUser(idUser);
         filmStorage.removeLike(id, idUser);
+        feedService.saveEventRemoveLikeFilm(id, idUser);
     }
 
     public List<Film> getPopularFilm(Integer count, Integer genreId, Integer year) {
 
         String genreName;
-        if (year != null && genreId != null){
+        if (year != null && genreId != null) {
             genreName = genreService.getGenre(genreId).getName();
             log.debug(String.format("Выдача списка %d популярных фильмов в жанре %s %d года", count, genreName, year));
         } else if (year == null && genreId != null) {
