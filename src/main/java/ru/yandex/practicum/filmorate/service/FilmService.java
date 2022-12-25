@@ -9,8 +9,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 
 @Slf4j
@@ -123,13 +122,28 @@ public class FilmService {
     public List<Film> getUserRecommendations(Integer id) {
         log.debug(String.format("выдача рекомендованных фильмов для пользователя %d", id));
         userService.isContainsUser(id);
-        return directorService.loadFilmsDirector(genreService.loadFilmsGenre(filmStorage.getUserRecommendations(id)));
+        return giveFilmsGenresAndDirector(filmStorage.getUserRecommendations(id));
     }
 
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
         log.debug(String.format("Выдача списка общих фильмов у пользователей с id %d и %d", userId, friendId));
         userService.isContainsUser(userId);
         userService.isContainsUser(friendId);
-        return directorService.loadFilmsDirector(genreService.loadFilmsGenre(filmStorage.getCommonFilms(userId, friendId)));
+        return giveFilmsGenresAndDirector(filmStorage.getCommonFilms(userId, friendId));
+    }
+
+    public List<Film> getSearchedFilms(String query, String by) {
+        Set<Film> films = new HashSet<>();
+        if (by.contains("director")) {
+            films.addAll(filmStorage.getSearchedFilmsByDirector(query));
+        }
+        if (by.contains("title")) {
+            films.addAll(filmStorage.getSearchedFilmsByTitle(query));
+        }
+        return giveFilmsGenresAndDirector(new ArrayList<>(films));
+    }
+
+    private List<Film> giveFilmsGenresAndDirector(List<Film> films) {
+        return directorService.loadFilmsDirector(genreService.loadFilmsGenre(films));
     }
 }
