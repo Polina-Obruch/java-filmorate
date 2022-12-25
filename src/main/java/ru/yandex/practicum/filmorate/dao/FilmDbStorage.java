@@ -271,7 +271,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getSearchedFilmsByDirector(String query) {
-        log.debug("Отправляем запрос на поиск фильмов по режиссеру");
+        log.debug("Запрос к БД на поиск фильмов по режиссеру");
         final String sqlQuery = "SELECT * " +
                 "FROM FILMS " +
                 "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
@@ -283,7 +283,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getSearchedFilmsByTitle(String query) {
-        log.debug("Отправляем запрос на поиск фильмов по названию");
+        log.debug("Запрос к БД на поиск фильмов по названию");
         final String sqlQuery = "SELECT * " +
                 "FROM FILMS " +
                 "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
