@@ -78,8 +78,8 @@ public class FilmService {
         log.debug(String.format("Добавление лайка фильму с id = %d от пользователя с id = %d", id, idUser));
         isFilmContains(id);
         userService.isContainsUser(idUser);
-        filmStorage.addLike(id, idUser);
         feedService.saveEventAddLikeFilm(id, idUser);
+        filmStorage.addLike(id, idUser);
     }
 
     public void removeLike(Integer id, Integer idUser) {

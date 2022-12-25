@@ -33,7 +33,7 @@ public class FeedService {
 
     public void saveEventAddLikeFilm(Integer filmId, Integer userId) {
         log.debug(String.format("Сохранение события - поставил лайк - для пользоватесля с id = %d", userId));
-        feedDbStorage.addLike(filmId,userId);
+        feedDbStorage.addLike(filmId, userId);
 
     }
 
@@ -57,7 +57,7 @@ public class FeedService {
 
     public void saveEventUpdateReview(Integer reviewId, Integer userId) {
         log.debug(String.format("Сохранение события - обновить отзыв - для пользоватесля с id = %d", userId));
-        feedDbStorage.updateReview(reviewId,userId);
+        feedDbStorage.updateReview(reviewId, userId);
 
     }
 }

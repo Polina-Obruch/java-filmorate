@@ -90,7 +90,6 @@ public class FeedDbStorage {
     }
 
 
-
     private static Event makeEvent(ResultSet rs, int rowNum) throws SQLException {
         return new Event(
                 rs.getInt("EVENT_ID"),
