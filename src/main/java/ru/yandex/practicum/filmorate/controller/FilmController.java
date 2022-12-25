@@ -97,8 +97,9 @@ public class FilmController {
     public List<Film> getSearchedFilms(@RequestParam String query, @RequestParam String by) {
         if (by.equals("title,director") || by.equals("director")
                 || by.equals("title") || by.equals("director,title")) {
+            List<Film> films = service.getSearchedFilms(query, by);
             log.debug(String.format("Был выдан список фильмов с поиском %s по значениям %s", query, by));
-            return service.getSearchedFilms(query, by);
+            return films;
         } else {
             throw new IncorrectParameterException("Неверное введены параметры поиска");
         }
