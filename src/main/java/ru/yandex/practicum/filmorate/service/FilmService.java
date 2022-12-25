@@ -133,9 +133,8 @@ public class FilmService {
     }
 
     public List<Film> getSearchedFilms(String query, String by) {
-        List<Film> films = new ArrayList<>(filmStorage.getSearchedFilms(query, by));
         log.debug(String.format("Выдача списка фильмов с поиском %s по %s", query, by));
-        return giveFilmsGenresAndDirector(films);
+        return giveFilmsGenresAndDirector(new ArrayList<>(filmStorage.getSearchedFilms(query, by)));
     }
 
     private List<Film> giveFilmsGenresAndDirector(List<Film> films) {
