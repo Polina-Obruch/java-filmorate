@@ -99,4 +99,16 @@ public class FilmController {
         log.debug(String.format("Был выден список общих фильмов у пользователей с id %d и %d", userId, friendId));
         return films;
     }
+
+    @GetMapping("/search")
+    public List<Film> getSearchedFilms(@RequestParam String query, @RequestParam String by) {
+        if (by.equals("title,director") || by.equals("director")
+                || by.equals("title") || by.equals("director,title")) {
+            List<Film> films = service.getSearchedFilms(query, by);
+            log.debug(String.format("Был выдан список фильмов с поиском %s по значениям %s", query, by));
+            return films;
+        } else {
+            throw new IncorrectParameterException("Неверное введены параметры поиска");
+        }
+    }
 }
