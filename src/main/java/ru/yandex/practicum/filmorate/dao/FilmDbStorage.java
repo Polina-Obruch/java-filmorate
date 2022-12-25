@@ -270,24 +270,35 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getSearchedFilmsByDirector(String query) {
-        log.debug("Запрос к БД на поиск фильмов по режиссеру");
-        final String sqlQuery = "SELECT * " +
-                "FROM FILMS " +
-                "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
-                "JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
-                "JOIN DIRECTORS ON FD.DIRECTOR_ID = DIRECTORS.DIRECTOR_ID " +
-                "WHERE LOWER(DIRECTORS.DIRECTOR_NAME) LIKE LOWER(?)";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, "%" + query + "%");
-    }
-
-    @Override
-    public List<Film> getSearchedFilmsByTitle(String query) {
-        log.debug("Запрос к БД на поиск фильмов по названию");
-        final String sqlQuery = "SELECT * " +
-                "FROM FILMS " +
-                "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
-                "WHERE LOWER(FILM_NAME) LIKE LOWER(?)";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, "%" + query + "%");
+    public List<Film> getSearchedFilms(String query, String by) {
+        log.debug("Запрос к БД на поиск фильмов по %s", by);
+        switch (by) {
+            case "title":
+                final String sqlQueryTitle = "SELECT * " +
+                        "FROM FILMS " +
+                        "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                        "WHERE LOWER(FILM_NAME) LIKE LOWER(?) " +
+                        "ORDER BY LIKES DESC";
+                return jdbcTemplate.query(sqlQueryTitle, FilmDbStorage::makeFilm, "%" + query + "%");
+            case "director":
+                final String sqlQueryDirector = "SELECT * " +
+                        "FROM FILMS " +
+                        "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                        "JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                        "JOIN DIRECTORS ON FD.DIRECTOR_ID = DIRECTORS.DIRECTOR_ID " +
+                        "WHERE LOWER(DIRECTORS.DIRECTOR_NAME) LIKE LOWER(?) " +
+                        "ORDER BY LIKES DESC";
+                return jdbcTemplate.query(sqlQueryDirector, FilmDbStorage::makeFilm, "%" + query + "%");
+            default:
+                final String sqlQueryAll = "SELECT * " +
+                        "FROM FILMS " +
+                        "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                        "LEFT JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                        "LEFT JOIN DIRECTORS ON FD.DIRECTOR_ID = DIRECTORS.DIRECTOR_ID " +
+                        "WHERE LOWER(FILM_NAME) LIKE LOWER(?) OR LOWER(DIRECTORS.DIRECTOR_NAME) LIKE LOWER(?) " +
+                        "ORDER BY LIKES DESC";
+                return jdbcTemplate.query(sqlQueryAll, FilmDbStorage::makeFilm, "%" + query + "%",
+                        "%" + query + "%");
+        }
     }
 }

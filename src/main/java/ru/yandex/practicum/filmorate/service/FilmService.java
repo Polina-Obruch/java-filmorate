@@ -133,14 +133,9 @@ public class FilmService {
     }
 
     public List<Film> getSearchedFilms(String query, String by) {
-        Set<Film> films = new HashSet<>();
-        if (by.contains("director")) {
-            films.addAll(filmStorage.getSearchedFilmsByDirector(query));
-        }
-        if (by.contains("title")) {
-            films.addAll(filmStorage.getSearchedFilmsByTitle(query));
-        }
-        return giveFilmsGenresAndDirector(new ArrayList<>(films));
+        List<Film> films = new ArrayList<>(filmStorage.getSearchedFilms(query, by));
+        log.debug(String.format("Выдача списка фильмов с поиском %s по %s", query, by));
+        return giveFilmsGenresAndDirector(films);
     }
 
     private List<Film> giveFilmsGenresAndDirector(List<Film> films) {
