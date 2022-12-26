@@ -27,4 +27,5 @@ public interface UserStorage {
     List<User> getCommonFriend(Integer id, Integer idOther);
 
     void isContains(Integer id);
+
 }

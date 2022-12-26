@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    private final FeedService feedService;
 
     public User getUser(Integer id) {
         log.debug(String.format("Выдача пользователя c id = %d", id));
@@ -46,8 +48,8 @@ public class UserService {
         log.debug(String.format("Добавление в друзья пользователю c id = %d пользователя с id = %d", id, idFriend));
         isContainsUser(id);
         isContainsUser(idFriend);
-
         userStorage.addFriend(id, idFriend);
+        feedService.saveEventAddFriend(id, idFriend);
     }
 
     public void removeFriend(Integer id, Integer idFriend) {
@@ -55,6 +57,7 @@ public class UserService {
         isContainsUser(id);
         isContainsUser(idFriend);
         userStorage.removeFriend(id, idFriend);
+        feedService.saveEventRemoveFriend(id, idFriend);
     }
 
     public List<User> getFriends(Integer id) {
@@ -71,6 +74,12 @@ public class UserService {
         return userStorage.getCommonFriend(id, idOther);
     }
 
+    public List<Event> getUserFeed(Integer id) {
+        log.debug(String.format("Выдача ленты новостей пользователя c id = %d", id));
+        isContainsUser(id);
+        return feedService.getUserFeed(id);
+    }
+
     private User validateName(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -81,4 +90,5 @@ public class UserService {
     public void isContainsUser(Integer id) {
         userStorage.isContains(id);
     }
+
 }

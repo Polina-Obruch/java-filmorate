@@ -27,14 +27,14 @@ public class ErrorHandler {
 
     @ExceptionHandler({FilmNotFoundException.class, UserNotFoundException.class,
             MpaNotFoundException.class, GenreNotFoundException.class, ReviewNotFoundException.class,
-             DirectorNotFoundException.class})
+            DirectorNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleFilmNotFound(final RuntimeException exp) {
         return new ErrorResponse(exp.getMessage());
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.ALREADY_REPORTED)
+    @ResponseStatus(HttpStatus.OK)
     public ErrorResponse handleDuplicateLike(final DuplicateLikeException exp) {
         return new ErrorResponse(exp.getMessage());
     }
