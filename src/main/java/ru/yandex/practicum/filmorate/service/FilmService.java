@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -43,7 +43,6 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         log.debug(String.format("Обновление фильма с id = %d", film.getId()));
-
         genreAndDirectorCheck(film);
         Film updateFilm = filmStorage.update(film);
         genreService.setFilmGenre(updateFilm);
@@ -115,11 +114,12 @@ public class FilmService {
             throw new IncorrectParameterException("Значение параметра sortBy должно быть \"year\" или \"likes\"");
         }
         isDirectorContains(directorId);
+
         log.debug(String.format("Выдача списка фильмов режиссёра %d отсортированных по критерию %s", directorId, sortBy));
         List<Film> films = genreService.loadFilmsGenre(filmStorage.getFilmsByDirector(directorId, sortBy.toLowerCase()));
         films = directorService.loadFilmsDirector(films);
         if (films.size() == 0) {
-            throw new FilmNotFoundException("Фильмов от этого режиссёра не найдено.");
+            throw new EntityNotFoundException("Фильмов от этого режиссёра не найдено.");
         }
         return films;
     }
@@ -133,7 +133,7 @@ public class FilmService {
     }
 
     public List<Film> getUserRecommendations(Integer id) {
-        log.debug(String.format("выдача рекомендованных фильмов для пользователя %d", id));
+        log.debug(String.format("Выдача рекомендованных фильмов для пользователя %d", id));
         userService.isContainsUser(id);
         return giveFilmsGenresAndDirector(filmStorage.getUserRecommendations(id));
     }

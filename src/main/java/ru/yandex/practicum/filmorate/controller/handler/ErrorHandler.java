@@ -15,33 +15,36 @@ import ru.yandex.practicum.filmorate.model.ValidationErrorResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
+//Вроде ловим все, что требывалось
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler(IncorrectParameterException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidateUser(final RuntimeException exp) {
+    public ErrorResponse handleValidateUser(final IncorrectParameterException exp) {
+        log.error(exp.getMessage());
         return new ErrorResponse(exp.getMessage());
     }
 
-    @ExceptionHandler({FilmNotFoundException.class, UserNotFoundException.class,
-            MpaNotFoundException.class, GenreNotFoundException.class, ReviewNotFoundException.class,
-            DirectorNotFoundException.class})
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleFilmNotFound(final RuntimeException exp) {
+    public ErrorResponse handleEntityNotFound(final EntityNotFoundException exp) {
+        log.error(exp.getMessage());
         return new ErrorResponse(exp.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse handleDuplicateLike(final DuplicateLikeException exp) {
+        log.error(exp.getMessage());
         return new ErrorResponse(exp.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleErrorCountResult(final CountOfResultNotExpectedException exp) {
+        log.error(exp.getMessage());
         return new ErrorResponse(exp.getMessage());
     }
 

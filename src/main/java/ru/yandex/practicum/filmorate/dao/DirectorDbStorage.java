@@ -11,7 +11,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
-import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
@@ -39,8 +39,7 @@ public class DirectorDbStorage implements DirectorStorage {
         final List<Director> directors = jdbcTemplate.query(sqlQuery, DirectorDbStorage::makeDirector, id);
 
         if (directors.size() == 0) {
-            log.debug(String.format("Режиссёр с id = %d не был найден в базе", id));
-            throw new DirectorNotFoundException(String.format("Режиссёр с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Режиссёр с id = %d не найден в базе", id));
         }
 
         if (directors.size() != 1) {
@@ -89,8 +88,7 @@ public class DirectorDbStorage implements DirectorStorage {
         int result = jdbcTemplate.update(sqlQuery, director.getName(), id);
 
         if (result == 0) {
-            log.debug(String.format("Режиссёр с id = %d не был найден в базе", id));
-            throw new DirectorNotFoundException(String.format("Режиссёр с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Режиссёр с id = %d не найден в базе", id));
         }
         return director;
     }
@@ -184,8 +182,7 @@ public class DirectorDbStorage implements DirectorStorage {
         final List<Director> directors = jdbcTemplate.query(simpleQuery, DirectorDbStorage::makeDirector, id);
 
         if (directors.size() == 0) {
-            log.debug(String.format("Режиссёр с id = %d не был найден в базе", id));
-            throw new DirectorNotFoundException(String.format("Режиссёр с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Режиссёр с id = %d не найден в базе", id));
         }
     }
 

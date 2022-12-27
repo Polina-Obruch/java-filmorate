@@ -9,7 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
-import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
@@ -29,6 +29,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review add(Review review) {
         log.debug("Запрос к БД на сохранение отзыва");
+
         String sqlQuery = "INSERT INTO REVIEWS(CONTENT, IS_POSITIVE, USER_ID, FILM_ID) "
                 + "VALUES(?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -51,6 +52,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review update(Review review) {
         log.debug("Запрос к БД на обновление отзыва");
+
         int id = review.getReviewId();
 
         final String sqlQuery = "UPDATE REVIEWS SET " +
@@ -60,8 +62,7 @@ public class ReviewDbStorage implements ReviewStorage {
         int result = jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), id);
 
         if (result == 0) {
-            log.debug(String.format("Отзыв с id = %d не был найден в базе", id));
-            throw new ReviewNotFoundException(String.format("Отзыв с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Отзыв с id = %d не найден в базе", id));
         }
 
         return this.get(id);
@@ -76,8 +77,7 @@ public class ReviewDbStorage implements ReviewStorage {
         final List<Review> review = jdbcTemplate.query(sqlQuery, ReviewDbStorage::makeReview, id);
 
         if (review.size() == 0) {
-            log.debug(String.format("Отзыв с id = %d не был найден в базе", id));
-            throw new ReviewNotFoundException(String.format("Отзыв с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Отзыв с id = %d не найден в базе", id));
         }
 
         if (review.size() != 1) {
@@ -107,6 +107,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public List<Review> getAllReviews(Integer count) {
         log.debug("Отправляем запрос на все отзывы из БД");
+
         final String sqlQuery = "SELECT *" +
                 "FROM REVIEWS " +
                 "ORDER BY USEFUL DESC, REVIEW_ID " +
@@ -118,6 +119,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public List<Review> getAllReviewsByFilmId(Integer filmId, Integer count) {
         log.debug("Отправляем запрос на все отзывы из БД для фильма");
+
         final String sqlQuery = "SELECT *" +
                 "FROM REVIEWS " +
                 "WHERE FILM_ID = ? " +
@@ -137,8 +139,7 @@ public class ReviewDbStorage implements ReviewStorage {
         List<Review> review = jdbcTemplate.query(sqlQuery, ReviewDbStorage::makeSimpleReview, id);
 
         if (review.size() == 0) {
-            log.debug(String.format("Отзыв с id = %d не был найден в базе", id));
-            throw new ReviewNotFoundException(String.format("Отзыв с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Отзыв с id = %d не найден в базе", id));
         }
 
         if (review.size() != 1) {
@@ -178,8 +179,6 @@ public class ReviewDbStorage implements ReviewStorage {
 
             //Если он ставит опять лайк -  так нельзя
             if (mark == 1) {
-                log.debug(String.format(
-                        "Лайк отзыву с id = %d от пользователя с id = %d уже был поставлен", id, userId));
                 throw new DuplicateLikeException(String.format(
                         "Лайк отзыву с id = %d от пользователя с id = %d уже был поставлен", id, userId));
             } else {
@@ -230,8 +229,6 @@ public class ReviewDbStorage implements ReviewStorage {
 
             //Если он ставит опять дизлайк -  так нельзя
             if (mark == -1) {
-                log.debug(String.format(
-                        "Дизлайк отзыву с id = %d от пользователя с id = %d уже был поставлен", id, userId));
                 throw new DuplicateLikeException(String.format(
                         "Дизлайк отзыву с id = %d от пользователя с id = %d уже был поставлен", id, userId));
             } else {
@@ -255,6 +252,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public void removeLike(Integer id, Integer userId) {
         log.debug("Запрос к БД на удаление лайка у отзыва");
+
         final String sqlQuery = "DELETE FROM REVIEWS_MARK " +
                 "WHERE REVIEW_ID = ? AND USER_ID = ? AND MARK = ?";
 
@@ -269,6 +267,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public void removeDislike(Integer id, Integer userId) {
         log.debug("Запрос к БД на удаление дизлайка у отзыва");
+
         final String sqlQuery = "DELETE FROM REVIEWS_MARK " +
                 "WHERE REVIEW_ID = ? AND USER_ID = ? AND MARK = ?";
 

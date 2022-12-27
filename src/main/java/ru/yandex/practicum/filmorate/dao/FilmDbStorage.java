@@ -9,7 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -31,6 +31,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film add(Film film) {
         log.debug("Запрос к БД на сохранение фильма");
+
         String sqlQuery = "INSERT INTO FILMS(film_name, film_description, release_date, duration, mpa_id) "
                 + "VALUES(?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -54,6 +55,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void remove(Integer id) {
         log.debug("Запрос к БД на удаление");
+
         final String sqlQuery = "DELETE FROM FILMS " +
                 "WHERE FILM_ID = ? ";
 
@@ -62,6 +64,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film get(Integer id) {
+        log.debug("Запрос к БД на выдачу фильма");
+
         final String sqlQuery = "SELECT *" +
                 "FROM FILMS " +
                 "INNER JOIN MPA M ON M.MPA_ID = FILMS.MPA_ID " +
@@ -70,8 +74,7 @@ public class FilmDbStorage implements FilmStorage {
         final List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, id);
 
         if (films.size() == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
 
         if (films.size() != 1) {
@@ -83,6 +86,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         log.debug("Запрос к БД на обновление фильма");
+
         int id = film.getId();
 
         final String sqlQuery = "UPDATE FILMS SET " +
@@ -93,8 +97,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), id);
 
         if (result == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
 
         return film;
@@ -103,6 +106,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         log.debug("Отправляем запрос на все фильмы из БД");
+
         final String sqlQuery = "SELECT *" +
                 "FROM FILMS " +
                 "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID ";
@@ -121,7 +125,6 @@ public class FilmDbStorage implements FilmStorage {
             jdbcTemplate.update(sqlQuery, id, idUser);
 
         } catch (DuplicateKeyException exp) {
-            log.debug(String.format("Лайк фильму с id = %d от пользователя с id = %d уже был поставлен", id, idUser));
             throw new DuplicateLikeException(String.format("Лайк фильму с id = %d от пользователя с id = %d уже был поставлен", id, idUser));
         }
 
@@ -135,6 +138,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void removeLike(Integer id, Integer idUser) {
         log.debug("Запрос к БД на удаление лайка");
+
         final String sqlQuery = "DELETE FROM FILMS_LIKES " +
                 "WHERE FILM_ID = ? AND USER_ID = ?";
 
@@ -152,14 +156,14 @@ public class FilmDbStorage implements FilmStorage {
         //При одинаковом количестве лайков выдаем в порядке ASC id
         String genreFilter = "";
         String yearFilter = "";
-        if (genreId != null){
+        if (genreId != null) {
             genreFilter = "JOIN FILMS_GENRE FG on FILMS.FILM_ID = FG.FILM_ID " +
                     "WHERE FG.GENRE_ID = " + genreId + " ";
         }
-        if (year != null){
-            if (genreId != null){
+        if (year != null) {
+            if (genreId != null) {
                 yearFilter = "AND EXTRACT(YEAR FROM FILMS.RELEASE_DATE) = " + year + " ";
-            } else{
+            } else {
                 yearFilter = "WHERE EXTRACT(YEAR FROM FILMS.RELEASE_DATE) = " + year + " ";
             }
         }
@@ -178,6 +182,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
         log.debug("Запрос к БД на фильмы конкретного режиссёра");
+
         String sortingCriteria = "";
         if (sortBy.equals("year")) {
             sortingCriteria = "ORDER BY RELEASE_DATE, FILMS.FILM_ID";
@@ -230,8 +235,7 @@ public class FilmDbStorage implements FilmStorage {
         final List<Film> films = jdbcTemplate.query(simpleQuery, FilmDbStorage::makeSimpleFilm, id);
 
         if (films.size() == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
     }
 
@@ -272,7 +276,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getSearchedFilms(String query, String by) {
-        log.debug("Запрос к БД на поиск фильмов по %s", by);
+        log.debug(String.format("Запрос к БД на поиск фильмов по %s", by));
+
         switch (by) {
             case "title":
                 final String sqlQueryTitle = "SELECT * " +

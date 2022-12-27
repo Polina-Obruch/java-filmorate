@@ -11,7 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.dao.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.dao.GenreDbStorage;
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -116,7 +116,7 @@ public class FilmDbStorageTest {
     public void removeFilmById() {
         filmDbStorage.remove(1);
 
-        final FilmNotFoundException exp = assertThrows(FilmNotFoundException.class,
+        final EntityNotFoundException exp = assertThrows(EntityNotFoundException.class,
                 () -> filmDbStorage.get(1));
         assertEquals("Фильм с id = 1 не найден в базе", exp.getMessage());
     }

@@ -7,7 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -28,6 +28,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User add(User user) {
         log.debug("Запрос к БД на добавление пользователя");
+
         String sqlQuery = "INSERT INTO USERS(USER_EMAIL, USER_NAME, USER_LOGIN, BIRTHDAY) "
                 + "VALUES(?, ?, ?, ?)";
 
@@ -100,8 +101,7 @@ public class UserDbStorage implements UserStorage {
                 user.getLogin(), user.getBirthday(), id);
 
         if (result == 0) {
-            log.debug(String.format("Пользователь с id = %d не был найден в базе", id));
-            throw new UserNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
         return user;
     }
@@ -109,6 +109,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User get(Integer id) {
         log.debug("Запрос к БД на выдачу пользователя");
+
         final String sqlQuery = "SELECT *" +
                 "FROM USERS " +
                 "WHERE USER_ID = ? ";
@@ -116,8 +117,7 @@ public class UserDbStorage implements UserStorage {
         final List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::makeUser, id);
 
         if (users.size() == 0) {
-            log.debug(String.format("Пользователь с id = %d не был найден в базе", id));
-            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", id));
         }
 
         if (users.size() != 1) {
@@ -130,6 +130,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAll() {
         log.debug("Отправляем запрос на всех юзеров из БД");
+
         final String sqlQuery = "SELECT* FROM USERS";
 
         return jdbcTemplate.query(sqlQuery, UserDbStorage::makeUser);
@@ -138,6 +139,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void addFriend(Integer id, Integer idFriend) {
         log.debug("Запрос к БД на добавление в друзья");
+
         final String sqlQuery = "INSERT INTO FRIENDS(USER_ID, FRIEND_ID) "
                 + "VALUES(?, ?)";
 
@@ -147,6 +149,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void removeFriend(Integer id, Integer idFriend) {
         log.debug("Запрос к БД на удаление друга");
+
         final String sqlQuery = "DELETE FROM FRIENDS " +
                 "WHERE USER_ID = ? AND FRIEND_ID = ?";
 
