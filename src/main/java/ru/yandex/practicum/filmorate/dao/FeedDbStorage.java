@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.dao;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,9 +13,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Repository
 public class FeedDbStorage {
+
     private final JdbcTemplate jdbcTemplate;
 
     public List<Event> getFeed(Integer id) {

@@ -1,21 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class ReviewService {
-    ReviewStorage reviewStorage;
-    FilmService filmService;
-    UserService userService;
-    FeedService feedService;
+    private final ReviewStorage reviewStorage;
+    private final FilmService filmService;
+    private final UserService userService;
+    private final FeedService feedService;
 
     public Review addReview(Review review) {
         log.debug("Сохранение отзыва");
@@ -44,12 +45,30 @@ public class ReviewService {
         feedService.saveEventRemoveReview(id, userId);
     }
 
-    public List<Review> getAllReviews(Integer count) {
+    public List<Review> getAllReviews(Integer filmId, Integer count) {
+        List<Review> reviews;
+
+        if (count <= 0) {
+            throw new IncorrectParameterException("Значение параметра count должно быть больше нуля");
+        }
+
+        if (filmId != null && filmId > 0) {
+            reviews = this.getAllReviewsByFilmId(filmId, count);
+        } else if (filmId == null) {
+            reviews = this.getAllReviewsWithCount(count);
+        } else {
+            throw new IncorrectParameterException("Значение параметра filmId должно быть больше нуля");
+        }
+
+        return reviews;
+    }
+
+    private List<Review> getAllReviewsWithCount(Integer count) {
         log.debug(String.format("Выдача списка всех отзывов с count = %d", count));
         return reviewStorage.getAllReviews(count);
     }
 
-    public List<Review> getAllReviewsByFilmId(Integer filmId, Integer count) {
+    private List<Review> getAllReviewsByFilmId(Integer filmId, Integer count) {
         log.debug(String.format("Выдача списка отзывов для фильма с id = %d и  count = %d", filmId, count));
         filmService.isFilmContains(filmId);
 

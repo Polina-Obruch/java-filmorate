@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FeedDbStorage;
@@ -9,10 +9,11 @@ import ru.yandex.practicum.filmorate.model.Event;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class FeedService {
-    FeedDbStorage feedDbStorage;
+
+    private final FeedDbStorage feedDbStorage;
 
     public List<Event> getUserFeed(Integer id) {
         log.debug(String.format("Выдача ленты новостей для пользоватесля с id = %d", id));

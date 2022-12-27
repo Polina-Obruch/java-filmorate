@@ -13,26 +13,26 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class GenreService {
-    private final GenreDbStorage storage;
+    private final GenreDbStorage genreDbStorage;
 
     public Genre getGenre(Integer id) {
         log.debug(String.format("Выдача Genre c id = %d", id));
-        return storage.getGenre(id);
+        return genreDbStorage.getGenre(id);
     }
 
     public List<Genre> getAllGenre() {
         log.debug("Выдача всех Genre");
-        return storage.getAllGenre();
+        return genreDbStorage.getAllGenre();
     }
 
     public void setFilmGenre(Film film) {
         log.debug("Сохранение жанров фильма");
-        storage.setFilmGenre(film);
+        genreDbStorage.setFilmGenre(film);
     }
 
     public Film loadFilmGenre(Film film) {
         log.debug("Загрузка жанров для фильма");
-        return storage.loadFilmGenre(film);
+        return genreDbStorage.loadFilmGenre(film);
     }
 
     public List<Film> loadFilmsGenre(List<Film> films) {
@@ -42,6 +42,6 @@ public class GenreService {
         if (films.isEmpty()) {
             return films;
         }
-        return storage.loadFilmsGenre(films);
+        return genreDbStorage.loadFilmsGenre(films);
     }
 }

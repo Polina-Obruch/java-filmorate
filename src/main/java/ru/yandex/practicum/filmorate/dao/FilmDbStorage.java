@@ -25,6 +25,7 @@ import java.util.*;
 @Repository
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override

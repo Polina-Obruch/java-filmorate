@@ -17,18 +17,18 @@ import java.util.List;
 @RequestMapping("/mpa")
 @RequiredArgsConstructor
 public class MpaController {
-    private final MpaService service;
+    private final MpaService mpaService;
 
     @GetMapping("/{id}")
     public Mpa getMpa(@PathVariable Integer id) {
-        Mpa saveMpa = service.getMpa(id);
+        Mpa saveMpa = mpaService.getMpa(id);
         log.debug(String.format("MPA с id = %d был выдан", id));
         return saveMpa;
     }
 
     @GetMapping
     public List<Mpa> getAllMpa() {
-        List<Mpa> mpas = service.getAllMpa();
+        List<Mpa> mpas = mpaService.getAllMpa();
         log.debug("Список всех MPA был выдан");
         return mpas;
     }

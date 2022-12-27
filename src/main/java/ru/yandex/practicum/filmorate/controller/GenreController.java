@@ -16,18 +16,18 @@ import java.util.List;
 @RequestMapping("/genres")
 @RequiredArgsConstructor
 public class GenreController {
-    private final GenreService service;
+    private final GenreService genreService;
 
     @GetMapping("/{id}")
     public Genre getGenre(@PathVariable Integer id) {
-        Genre saveGenre = service.getGenre(id);
+        Genre saveGenre = genreService.getGenre(id);
         log.debug(String.format("Genre с id = %d был выдан", id));
         return saveGenre;
     }
 
     @GetMapping
     public List<Genre> getAllGenre() {
-        List<Genre> genres = service.getAllGenre();
+        List<Genre> genres = genreService.getAllGenre();
         log.debug("Список всех Genre был выдан");
         return genres;
     }
