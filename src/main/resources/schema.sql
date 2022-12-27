@@ -1,7 +1,7 @@
 create table IF NOT EXISTS GENRE
 (
     GENRE_ID   INTEGER not null,
-    GENRE_NAME VARCHAR not null,
+    GENRE_NAME VARCHAR(63) not null,
     constraint GENRE_PK
         primary key (GENRE_ID)
 );
@@ -9,7 +9,7 @@ create table IF NOT EXISTS GENRE
 create table IF NOT EXISTS MPA
 (
     MPA_ID   INTEGER not null,
-    MPA_NAME VARCHAR not null,
+    MPA_NAME VARCHAR(63) not null,
     constraint MPA_PK
         primary key (MPA_ID)
 );
@@ -17,8 +17,8 @@ create table IF NOT EXISTS MPA
 create table IF NOT EXISTS FILMS
 (
     FILM_ID          INTEGER AUTO_INCREMENT,
-    FILM_NAME        VARCHAR      not null,
-    FILM_DESCRIPTION VARCHAR(200) not null,
+    FILM_NAME        VARCHAR(63)      not null,
+    FILM_DESCRIPTION VARCHAR(255) not null,
     RELEASE_DATE     DATE         not null,
     DURATION         INTEGER      not null,
     MPA_ID           INTEGER      not null,
@@ -42,9 +42,9 @@ create table IF NOT EXISTS FILMS_GENRE
 create table IF NOT EXISTS USERS
 (
     USER_ID    INTEGER AUTO_INCREMENT,
-    USER_EMAIL VARCHAR not null,
-    USER_NAME  VARCHAR not null,
-    USER_LOGIN VARCHAR not null,
+    USER_EMAIL VARCHAR(255) not null,
+    USER_NAME  VARCHAR(64) not null,
+    USER_LOGIN VARCHAR(32) not null,
     BIRTHDAY   DATE    not null,
     constraint USERS_PK
         primary key (USER_ID)
@@ -74,7 +74,7 @@ create table IF NOT EXISTS FRIENDS
 create table IF NOT EXISTS DIRECTORS
 (
     DIRECTOR_ID   INTEGER AUTO_INCREMENT,
-    DIRECTOR_NAME VARCHAR not null,
+    DIRECTOR_NAME VARCHAR(127) not null,
     constraint DIRECTORS_PK
         primary key (DIRECTOR_ID)
 );
@@ -92,7 +92,7 @@ create table IF NOT EXISTS FILMS_DIRECTORS
 create table IF NOT EXISTS REVIEWS
 (
     REVIEW_ID   INTEGER AUTO_INCREMENT,
-    CONTENT     VARCHAR not null,
+    CONTENT     VARCHAR(16383) not null,
     IS_POSITIVE BOOLEAN not null,
     USER_ID     INTEGER not null,
     FILM_ID     INTEGER not null,
@@ -125,8 +125,8 @@ create table IF NOT EXISTS EVENTS
     EVENT_ID INTEGER AUTO_INCREMENT,
     TIME_EVENT TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     USER_ID INTEGER NOT NULL,
-    EVENT_TYPE VARCHAR NOT NULL,
-    OPERATION VARCHAR NOT NULL,
+    EVENT_TYPE VARCHAR(64) NOT NULL,
+    OPERATION VARCHAR(255) NOT NULL,
     ENTITY_ID INTEGER NOT NULL,
     constraint EVENTS_PK
         primary key (EVENT_ID),
