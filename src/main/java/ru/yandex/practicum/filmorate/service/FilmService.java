@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.*;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,7 +21,6 @@ public class FilmService {
     private final GenreService genreService;
     private final DirectorService directorService;
     private final FeedService feedService;
-
 
     public Film getFilm(Integer id) {
         log.debug(String.format("Выдача фильма с id = %d", id));
