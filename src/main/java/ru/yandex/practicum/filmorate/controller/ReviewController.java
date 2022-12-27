@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
@@ -14,9 +12,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/reviews")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReviewController {
-    ReviewService reviewService;
+
+    private final ReviewService reviewService;
 
     @PostMapping
     public Review addReview(@RequestBody @Valid Review review) {
@@ -31,7 +30,6 @@ public class ReviewController {
         log.debug(String.format("Отзыв с id = %d был обновлен", saveReview.getReviewId()));
         return saveReview;
     }
-
 
     @GetMapping("/{id}")
     public Review getReview(@PathVariable Integer id) {
@@ -49,20 +47,8 @@ public class ReviewController {
     @GetMapping
     public List<Review> getAllReviews(@RequestParam(required = false) Integer filmId,
                                       @RequestParam(defaultValue = "10", required = false) Integer count) {
-        List<Review> reviews;
 
-        if (count <= 0) {
-            throw new IncorrectParameterException("Значение параметра count должно быть больше нуля");
-        }
-
-        if (filmId != null && filmId > 0) {
-            reviews = reviewService.getAllReviewsByFilmId(filmId, count);
-        } else if (filmId == null) {
-            reviews = reviewService.getAllReviews(count);
-        } else {
-            throw new IncorrectParameterException("Значение параметра filmId должно быть больше нуля");
-        }
-
+        List<Review> reviews = reviewService.getAllReviews(filmId, count);
         log.debug("Список всех отзывов был выдан");
         return reviews;
     }

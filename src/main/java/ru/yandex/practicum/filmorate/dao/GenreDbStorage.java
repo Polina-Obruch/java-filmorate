@@ -26,7 +26,6 @@ public class GenreDbStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-
     public Genre getGenre(Integer id) {
         final String sqlQuery = "SELECT *" +
                 "FROM GENRE " +
@@ -46,7 +45,6 @@ public class GenreDbStorage {
         return genre.get(0);
     }
 
-
     public List<Genre> getAllGenre() {
         final String sqlQuery = "SELECT *" +
                 "FROM GENRE ";
@@ -61,7 +59,6 @@ public class GenreDbStorage {
 
         return genre;
     }
-
 
     public void setFilmGenre(Film film) {
         log.debug("Запрос к БД на удаление старых жанров");
@@ -106,7 +103,6 @@ public class GenreDbStorage {
         film.setGenres(new LinkedHashSet<>(genres));
         return film;
     }
-
 
     public List<Film> loadFilmsGenre(List<Film> films) {
         log.debug("Запрос к БД на загрузку жанров для нескольких фильмов");

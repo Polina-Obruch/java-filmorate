@@ -1,11 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -17,6 +14,7 @@ import java.util.List;
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
+
     private final FilmService filmService;
 
     @GetMapping
@@ -68,7 +66,7 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilm(@RequestParam(defaultValue = "10", required = false) Integer count,
                                      @RequestParam(required = false) Integer genreId,
-                                     @RequestParam(required = false) Integer year) {
+                                     @RequestParam(required = false) Integer year) {                         
         List<Film> films = filmService.getPopularFilm(count, genreId, year);
         log.debug(String.format("Был выдан список %d популярных фильмов", count));
         return films;
