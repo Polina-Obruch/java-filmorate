@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -70,7 +70,7 @@ public class UserDbStorageTest {
 
         userDbStorage.remove(1);
 
-        final UserNotFoundException exp = assertThrows(UserNotFoundException.class,
+        final EntityNotFoundException exp = assertThrows(EntityNotFoundException.class,
                 () -> userDbStorage.get(1));
         assertEquals("Пользователь с id = 1 не найден в базе", exp.getMessage());
     }

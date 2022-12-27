@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
-import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
@@ -27,8 +27,7 @@ public class MpaDbStorage {
         List<Mpa> mpa = jdbcTemplate.query(sqlQuery, MpaDbStorage::makeMpa, id);
 
         if (mpa.isEmpty()) {
-            log.debug(String.format("MPA с id = %d не был найден в базе", id));
-            throw new MpaNotFoundException(String.format("MPA с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("MPA с id = %d не найден в базе", id));
         }
 
         if (mpa.size() != 1) {
@@ -45,8 +44,8 @@ public class MpaDbStorage {
         List<Mpa> mpa = jdbcTemplate.query(sqlQuery, MpaDbStorage::makeMpa);
 
         if (mpa.isEmpty()) {
-            log.debug("MPA не были найдены в базе");
-            throw new MpaNotFoundException("MPA не были найдены в базе");
+            log.error("MPA не были найдены в базе");
+            throw new EntityNotFoundException("MPA не были найдены в базе");
         }
 
         return mpa;
@@ -56,5 +55,4 @@ public class MpaDbStorage {
         return new Mpa(rs.getInt("MPA_ID"),
                 rs.getString("MPA_NAME"));
     }
-
 }
