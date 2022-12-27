@@ -15,30 +15,30 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DirectorController {
 
-    private final DirectorService service;
+    private final DirectorService directorService;
 
     @GetMapping
     public List<Director> getAllDirectors() {
-        return service.getDirectors();
+        return directorService.getDirectors();
     }
 
     @GetMapping("/{id}")
     public Director getDirectorById(@PathVariable int id) {
-        return service.getDirector(id);
+        return directorService.getDirector(id);
     }
 
     @PostMapping
     public Director createDirector(@RequestBody @Valid Director director) {
-        return service.addDirector(director);
+        return directorService.addDirector(director);
     }
 
     @PutMapping
     public Director updateDirector(@RequestBody @Valid Director director) {
-        return service.updateDirector(director);
+        return directorService.updateDirector(director);
     }
 
     @DeleteMapping("/{id}")
     public void deleteDirector(@PathVariable int id) {
-        service.removeDirector(id);
+        directorService.removeDirector(id);
     }
 }
