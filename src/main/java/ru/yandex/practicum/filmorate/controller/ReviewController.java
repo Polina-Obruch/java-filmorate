@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,6 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-
     @PostMapping
     public Review addReview(@RequestBody @Valid Review review) {
         Review saveReview = reviewService.addReview(review);
@@ -32,7 +30,6 @@ public class ReviewController {
         log.debug(String.format("Отзыв с id = %d был обновлен", saveReview.getReviewId()));
         return saveReview;
     }
-
 
     @GetMapping("/{id}")
     public Review getReview(@PathVariable Integer id) {

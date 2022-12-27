@@ -12,6 +12,7 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 public class Genre {
+
     private Integer id;
     private String name;
 

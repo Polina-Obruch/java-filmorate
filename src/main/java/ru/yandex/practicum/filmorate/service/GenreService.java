@@ -13,6 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class GenreService {
+
     private final GenreDbStorage genreDbStorage;
 
     public Genre getGenre(Integer id) {

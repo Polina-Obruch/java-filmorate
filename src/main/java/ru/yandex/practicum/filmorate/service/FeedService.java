@@ -23,42 +23,35 @@ public class FeedService {
     public void saveEventAddFriend(Integer id, Integer friendId) {
         log.debug(String.format("Сохранение события - добавить в друзья - для пользоватесля с id = %d", id));
         feedDbStorage.addFriend(id, friendId);
-
     }
 
     public void saveEventRemoveFriend(Integer id, Integer friendId) {
         log.debug(String.format("Сохранение события - удалить из друзей - для пользоватесля с id = %d", id));
         feedDbStorage.removeFriend(id, friendId);
-
     }
 
     public void saveEventAddLikeFilm(Integer filmId, Integer userId) {
         log.debug(String.format("Сохранение события - поставил лайк - для пользоватесля с id = %d", userId));
         feedDbStorage.addLike(filmId, userId);
-
     }
 
     public void saveEventRemoveLikeFilm(Integer filmId, Integer userId) {
         log.debug(String.format("Сохранение события - удалить лайк - для пользоватесля с id = %d", userId));
         feedDbStorage.removeLike(filmId, userId);
-
     }
 
     public void saveEventAddReview(Integer reviewId, Integer userId) {
         log.debug(String.format("Сохранение события - добавить отзыв - для пользоватесля с id = %d", userId));
         feedDbStorage.addReview(reviewId, userId);
-
     }
 
     public void saveEventRemoveReview(Integer reviewId, Integer userId) {
         log.debug(String.format("Сохранение события - удалить отзыв - для пользоватесля с id = %d", userId));
         feedDbStorage.removeReview(reviewId, userId);
-
     }
 
     public void saveEventUpdateReview(Integer reviewId, Integer userId) {
         log.debug(String.format("Сохранение события - обновить отзыв - для пользоватесля с id = %d", userId));
         feedDbStorage.updateReview(reviewId, userId);
-
     }
 }

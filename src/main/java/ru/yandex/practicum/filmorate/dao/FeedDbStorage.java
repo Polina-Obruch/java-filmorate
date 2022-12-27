@@ -18,6 +18,8 @@ import java.util.List;
 public class FeedDbStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private static final String SQL_FEED = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
+            + "VALUES(?, ?, ?, ?)";
 
     public List<Event> getFeed(Integer id) {
         log.debug("Запрос к БД на выдачу ленты новостей");
@@ -29,67 +31,52 @@ public class FeedDbStorage {
 
     public void removeFriend(Integer id, Integer idFriend) {
         log.debug("Запрос к БД на новость об удалении друга");
-        final String sqlFeed = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
-                + "VALUES(?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlFeed, id, String.valueOf(EventType.FRIEND),
+        jdbcTemplate.update(SQL_FEED, id, String.valueOf(EventType.FRIEND),
                 String.valueOf(EventOperation.REMOVE), idFriend);
     }
 
     public void addFriend(Integer id, Integer idFriend) {
         log.debug("Запрос к БД на новость о добавлении друга");
-        final String sqlFeed = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
-                + "VALUES(?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlFeed, id, String.valueOf(EventType.FRIEND),
+        jdbcTemplate.update(SQL_FEED, id, String.valueOf(EventType.FRIEND),
                 String.valueOf(EventOperation.ADD), idFriend);
     }
 
     public void addLike(Integer filmId, Integer userId) {
         log.debug("Запрос к БД на новость о добавлении лайка к фильму");
-        final String sqlFeed = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
-                + "VALUES(?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlFeed, userId, String.valueOf(EventType.LIKE),
+        jdbcTemplate.update(SQL_FEED, userId, String.valueOf(EventType.LIKE),
                 String.valueOf(EventOperation.ADD), filmId);
     }
 
     public void removeLike(Integer filmId, Integer userId) {
         log.debug("Запрос к БД на новость об удалении лайка к фильму");
-        final String sqlFeed = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
-                + "VALUES(?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlFeed, userId, String.valueOf(EventType.LIKE),
+        jdbcTemplate.update(SQL_FEED, userId, String.valueOf(EventType.LIKE),
                 String.valueOf(EventOperation.REMOVE), filmId);
     }
 
     public void addReview(Integer reviewId, Integer userId) {
         log.debug("Запрос к БД на новость о добавлении отзыва");
-        final String sqlFeed = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
-                + "VALUES(?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlFeed, userId, String.valueOf(EventType.REVIEW),
+        jdbcTemplate.update(SQL_FEED, userId, String.valueOf(EventType.REVIEW),
                 String.valueOf(EventOperation.ADD), reviewId);
     }
 
     public void removeReview(Integer reviewId, Integer userId) {
         log.debug("Запрос к БД на новость об удалении отзыва");
-        final String sqlFeed = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
-                + "VALUES(?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlFeed, userId, String.valueOf(EventType.REVIEW),
+        jdbcTemplate.update(SQL_FEED, userId, String.valueOf(EventType.REVIEW),
                 String.valueOf(EventOperation.REMOVE), reviewId);
     }
 
     public void updateReview(Integer reviewId, Integer userId) {
         log.debug("Запрос к БД на новость об обновлении отзыва");
-        final String sqlFeed = "INSERT INTO EVENTS(USER_ID, EVENT_TYPE, OPERATION, ENTITY_ID) "
-                + "VALUES(?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlFeed, userId, String.valueOf(EventType.REVIEW),
+        jdbcTemplate.update(SQL_FEED, userId, String.valueOf(EventType.REVIEW),
                 String.valueOf(EventOperation.UPDATE), reviewId);
     }
-
 
     private static Event makeEvent(ResultSet rs, int rowNum) throws SQLException {
         return new Event(
