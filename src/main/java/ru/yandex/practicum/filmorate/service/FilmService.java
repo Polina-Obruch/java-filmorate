@@ -149,7 +149,12 @@ public class FilmService {
 
     public List<Film> getSearchedFilms(String query, String by) {
         log.debug(String.format("Выдача списка фильмов с поиском %s по %s", query, by));
-        return giveFilmsGenresAndDirector(new ArrayList<>(filmStorage.getSearchedFilms(query, by)));
+        if (by.equals("title,director") || by.equals("director")
+                || by.equals("title") || by.equals("director,title")) {
+            return giveFilmsGenresAndDirector(new ArrayList<>(filmStorage.getSearchedFilms(query, by)));
+        } else {
+            throw new IncorrectParameterException("Неверно введены параметры поиска");
+        }
     }
 
     private List<Film> giveFilmsGenresAndDirector(List<Film> films) {
