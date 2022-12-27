@@ -85,13 +85,14 @@ public class FilmController {
     @GetMapping("/common")
     public List<Film> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
         List<Film> films = filmService.getCommonFilms(userId, friendId);
-        log.debug(String.format("Был выден список общих фильмов у пользователей с id %d и %d", userId, friendId));
+        log.debug(String.format("Был выдан список общих фильмов у пользователей с id %d и %d", userId, friendId));
         return films;
     }
 
     @GetMapping("/search")
     public List<Film> getSearchedFilms(@RequestParam String query, @RequestParam String by) {
+        List<Film> films = filmService.getSearchedFilms(query, by);
         log.debug(String.format("Был выдан список фильмов с поиском %s по значениям %s", query, by));
-        return filmService.getSearchedFilms(query, by);
+        return films;
     }
 }
