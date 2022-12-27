@@ -69,11 +69,7 @@ public class FilmController {
     public List<Film> getPopularFilm(@RequestParam(defaultValue = "10", required = false) Integer count,
                                      @RequestParam(required = false) Integer genreId,
                                      @RequestParam(required = false) Integer year) {
-        if (count <= 0) {
-            throw new IncorrectParameterException("Значение параметра count должно быть больше нуля");
-        } else if (genreId != null && (genreId <= 0 || genreId >= 7)) {
-            throw new IncorrectParameterException("Значение параметра genreId должно быть от 1 до 6");
-        }
+                                     
         List<Film> films = filmService.getPopularFilm(count, genreId, year);
         log.debug(String.format("Был выдан список %d популярных фильмов", count));
         return films;
@@ -82,13 +78,8 @@ public class FilmController {
     @GetMapping("/director/{directorId}")
     public List<Film> getDirectorFilm(@PathVariable Integer directorId,
                                       @RequestParam(defaultValue = "year", required = false) String sortBy) {
-        if (!(sortBy.equals("year".toLowerCase()) || sortBy.equals("likes".toLowerCase()))) {
-            throw new IncorrectParameterException("Значение параметра sortBy должно быть \"year\" или \"likes\"");
-        }
+
         List<Film> films = filmService.getDirectorFilm(directorId, sortBy);
-        if (films.size() == 0) {
-            throw new FilmNotFoundException("Фильмов от этого режиссёра не найдено.");
-        }
         log.debug(String.format("Был выдан список режиссёра %d, отсортированный по значению %s", directorId, sortBy));
         return films;
     }
@@ -96,19 +87,14 @@ public class FilmController {
     @GetMapping("/common")
     public List<Film> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
         List<Film> films = filmService.getCommonFilms(userId, friendId);
-        log.debug(String.format("Был выден список общих фильмов у пользователей с id %d и %d", userId, friendId));
+        log.debug(String.format("Был выдан список общих фильмов у пользователей с id %d и %d", userId, friendId));
         return films;
     }
 
     @GetMapping("/search")
     public List<Film> getSearchedFilms(@RequestParam String query, @RequestParam String by) {
-        if (by.equals("title,director") || by.equals("director")
-                || by.equals("title") || by.equals("director,title")) {
-            List<Film> films = filmService.getSearchedFilms(query, by);
-            log.debug(String.format("Был выдан список фильмов с поиском %s по значениям %s", query, by));
-            return films;
-        } else {
-            throw new IncorrectParameterException("Неверное введены параметры поиска");
-        }
+        List<Film> films = filmService.getSearchedFilms(query, by);
+        log.debug(String.format("Был выдан список фильмов с поиском %s по значениям %s", query, by));
+        return films;
     }
 }

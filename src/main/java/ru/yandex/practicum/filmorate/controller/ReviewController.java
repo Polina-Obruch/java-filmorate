@@ -15,7 +15,9 @@ import java.util.List;
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
+
     private final ReviewService reviewService;
+
 
     @PostMapping
     public Review addReview(@RequestBody @Valid Review review) {
@@ -48,6 +50,7 @@ public class ReviewController {
     @GetMapping
     public List<Review> getAllReviews(@RequestParam(required = false) Integer filmId,
                                       @RequestParam(defaultValue = "10", required = false) Integer count) {
+
         List<Review> reviews = reviewService.getAllReviews(filmId, count);
         log.debug("Список всех отзывов был выдан");
         return reviews;
