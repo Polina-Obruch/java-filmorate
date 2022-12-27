@@ -19,7 +19,6 @@ public class Director {
     @NotNull(message = "Имя Режиссёра не может быть null")
     private String name;
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
