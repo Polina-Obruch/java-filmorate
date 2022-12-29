@@ -3,7 +3,7 @@ Template repository for Filmorate project.
 
 ___
 ### ER-Diagram
-![](ERD.PNG)
+![](ER_IDEA.PNG)
 
 ---
 ### Request Examples
