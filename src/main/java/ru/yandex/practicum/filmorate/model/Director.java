@@ -1,33 +1,30 @@
 package ru.yandex.practicum.filmorate.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
-public class Genre {
+public class Director {
 
     private Integer id;
+
+    @NotBlank(message = "Имя Режиссёра не может быть пустым")
+    @NotNull(message = "Имя Режиссёра не может быть null")
     private String name;
 
-    //Рекоммендовали не использовать @Data
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Genre genre = (Genre) o;
-        if (name == null && genre.name == null) {
-            return id.equals(genre.id);
-        } else if ((name == null || genre.name == null)) {
-            return false;
-        }
-        return id.equals(genre.id) && name.equals(genre.name);
+        Director director = (Director) o;
+        return id.equals(director.id) && Objects.equals(name, director.name);
     }
 
     @Override

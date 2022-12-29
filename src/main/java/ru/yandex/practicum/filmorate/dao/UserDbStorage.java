@@ -7,7 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -28,6 +28,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User add(User user) {
         log.debug("Запрос к БД на добавление пользователя");
+
         String sqlQuery = "INSERT INTO USERS(USER_EMAIL, USER_NAME, USER_LOGIN, BIRTHDAY) "
                 + "VALUES(?, ?, ?, ?)";
 
@@ -49,6 +50,37 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void remove(Integer id) {
+        //Прежде чем удалить юзера, необходимо удалить его лайки и дизлайки на отзывы/фильмы
+        //Записи в таблицах удалятся самостоятельно
+        //Но необходим перерасчет значений полей likes/useful в фильмы/отзывы
+
+        log.debug("Запрос к БД на обновление USEFUL для отзывов, которые лайкнул удаляемый пользователь");
+        final String sqlLikeQuery = "UPDATE REVIEWS SET USEFUL = REVIEWS.USEFUL - 1 " +
+                "WHERE REVIEW_ID IN " +
+                "(SELECT REVIEW_ID " +
+                "FROM REVIEWS_MARK " +
+                "WHERE USER_ID = ? AND MARK = ?)";
+
+        jdbcTemplate.update(sqlLikeQuery, id, 1);
+
+        log.debug("Запрос к БД на обновление USEFUL для отзывов, которые дизлайкнул удаляемый пользователь");
+        final String sqlDislikeQuery = "UPDATE REVIEWS SET USEFUL = REVIEWS.USEFUL + 1 " +
+                "WHERE REVIEW_ID IN " +
+                "(SELECT REVIEW_ID " +
+                "FROM REVIEWS_MARK " +
+                "WHERE USER_ID = ? AND MARK = ?)";
+
+        jdbcTemplate.update(sqlDislikeQuery, id, -1);
+
+        log.debug("Запрос к БД на обновление LIKES для фильмов, которые лайкнул удаляемый пользователь");
+        final String sqlFilmLikeQuery = "UPDATE FILMS SET LIKES = LIKES - 1 " +
+                "WHERE FILM_ID IN " +
+                "(SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ?)";
+
+        jdbcTemplate.update(sqlFilmLikeQuery, id);
+
         log.debug("Запрос к БД на удаление пользователя");
         final String sqlQuery = "DELETE FROM USERS " +
                 "WHERE USER_ID = ?";
@@ -62,15 +94,14 @@ public class UserDbStorage implements UserStorage {
         int id = user.getId();
 
         final String sqlQuery = "UPDATE USERS SET " +
-                "USER_ID = ?, USER_EMAIL = ?, USER_NAME = ?, USER_LOGIN = ?, BIRTHDAY = ? " +
+                "USER_EMAIL = ?, USER_NAME = ?, USER_LOGIN = ?, BIRTHDAY = ? " +
                 "WHERE USER_ID = ? ";
 
-        int result = jdbcTemplate.update(sqlQuery, id, user.getEmail(), user.getName(),
+        int result = jdbcTemplate.update(sqlQuery, user.getEmail(), user.getName(),
                 user.getLogin(), user.getBirthday(), id);
 
         if (result == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new UserNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
         return user;
     }
@@ -78,6 +109,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User get(Integer id) {
         log.debug("Запрос к БД на выдачу пользователя");
+
         final String sqlQuery = "SELECT *" +
                 "FROM USERS " +
                 "WHERE USER_ID = ? ";
@@ -85,8 +117,7 @@ public class UserDbStorage implements UserStorage {
         final List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::makeUser, id);
 
         if (users.size() == 0) {
-            log.debug(String.format("Пользователь с id = %d не был найден в базе", id));
-            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", id));
         }
 
         if (users.size() != 1) {
@@ -99,6 +130,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAll() {
         log.debug("Отправляем запрос на всех юзеров из БД");
+
         final String sqlQuery = "SELECT* FROM USERS";
 
         return jdbcTemplate.query(sqlQuery, UserDbStorage::makeUser);
@@ -107,6 +139,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void addFriend(Integer id, Integer idFriend) {
         log.debug("Запрос к БД на добавление в друзья");
+
         final String sqlQuery = "INSERT INTO FRIENDS(USER_ID, FRIEND_ID) "
                 + "VALUES(?, ?)";
 
@@ -116,6 +149,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void removeFriend(Integer id, Integer idFriend) {
         log.debug("Запрос к БД на удаление друга");
+
         final String sqlQuery = "DELETE FROM FRIENDS " +
                 "WHERE USER_ID = ? AND FRIEND_ID = ?";
 

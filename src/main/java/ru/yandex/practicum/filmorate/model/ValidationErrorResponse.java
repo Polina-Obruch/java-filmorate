@@ -8,7 +8,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 public class ValidationErrorResponse {
-    private final Map<String,String> errors;
+
+    private final Map<String, String> errors;
 }
 
 

@@ -12,6 +12,7 @@ import javax.validation.constraints.Positive;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Mpa {
+
     @Positive(message = "Идендификатор MPA не может быть отрицательным")
     private Integer id;
     private String name;

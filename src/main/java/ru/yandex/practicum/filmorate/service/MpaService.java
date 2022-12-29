@@ -12,15 +12,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MpaService {
-    private final MpaDbStorage storage;
+
+    private final MpaDbStorage mpaDbStorage;
 
     public Mpa getMpa(Integer id) {
         log.debug(String.format("Выдача MPA c id = %d", id));
-        return storage.getMpa(id);
+        return mpaDbStorage.getMpa(id);
     }
 
     public List<Mpa> getAllMpa() {
         log.debug("Выдача всех MPA");
-        return storage.getAllMpa();
+        return mpaDbStorage.getAllMpa();
     }
 }

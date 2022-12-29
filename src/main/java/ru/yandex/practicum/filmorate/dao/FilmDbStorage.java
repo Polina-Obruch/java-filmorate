@@ -3,19 +3,14 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
 import ru.yandex.practicum.filmorate.exception.DuplicateLikeException;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -24,18 +19,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Film add(Film film) {
         log.debug("Запрос к БД на сохранение фильма");
+
         String sqlQuery = "INSERT INTO FILMS(film_name, film_description, release_date, duration, mpa_id) "
                 + "VALUES(?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -59,6 +55,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void remove(Integer id) {
         log.debug("Запрос к БД на удаление");
+
         final String sqlQuery = "DELETE FROM FILMS " +
                 "WHERE FILM_ID = ? ";
 
@@ -67,6 +64,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film get(Integer id) {
+        log.debug("Запрос к БД на выдачу фильма");
+
         final String sqlQuery = "SELECT *" +
                 "FROM FILMS " +
                 "INNER JOIN MPA M ON M.MPA_ID = FILMS.MPA_ID " +
@@ -75,8 +74,7 @@ public class FilmDbStorage implements FilmStorage {
         final List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, id);
 
         if (films.size() == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
 
         if (films.size() != 1) {
@@ -88,18 +86,18 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         log.debug("Запрос к БД на обновление фильма");
+
         int id = film.getId();
 
         final String sqlQuery = "UPDATE FILMS SET " +
-                "film_id = ?, film_name = ?, film_description = ?, release_date = ?, duration = ?, mpa_id = ?" +
+                "film_name = ?, film_description = ?, release_date = ?, duration = ?, mpa_id = ?" +
                 "WHERE FILM_ID = ? ";
 
-        int result = jdbcTemplate.update(sqlQuery, id, film.getName(), film.getDescription(),
+        int result = jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), id);
 
         if (result == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
         }
 
         return film;
@@ -108,6 +106,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         log.debug("Отправляем запрос на все фильмы из БД");
+
         final String sqlQuery = "SELECT *" +
                 "FROM FILMS " +
                 "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID ";
@@ -126,7 +125,6 @@ public class FilmDbStorage implements FilmStorage {
             jdbcTemplate.update(sqlQuery, id, idUser);
 
         } catch (DuplicateKeyException exp) {
-            log.debug(String.format("Лайк фильму с id = %d от пользователя с id = %d уже был поставлен", id, idUser));
             throw new DuplicateLikeException(String.format("Лайк фильму с id = %d от пользователя с id = %d уже был поставлен", id, idUser));
         }
 
@@ -140,6 +138,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void removeLike(Integer id, Integer idUser) {
         log.debug("Запрос к БД на удаление лайка");
+
         final String sqlQuery = "DELETE FROM FILMS_LIKES " +
                 "WHERE FILM_ID = ? AND USER_ID = ?";
 
@@ -152,16 +151,51 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopularFilm(Integer count) {
+    public List<Film> getPopularFilm(Integer count, Integer genreId, Integer year) {
         log.debug("Запрос к БД на топ популярных фильмов");
         //При одинаковом количестве лайков выдаем в порядке ASC id
+        String genreFilter = "";
+        String yearFilter = "";
+        if (genreId != null) {
+            genreFilter = "JOIN FILMS_GENRE FG on FILMS.FILM_ID = FG.FILM_ID " +
+                    "WHERE FG.GENRE_ID = " + genreId + " ";
+        }
+        if (year != null) {
+            if (genreId != null) {
+                yearFilter = "AND EXTRACT(YEAR FROM FILMS.RELEASE_DATE) = " + year + " ";
+            } else {
+                yearFilter = "WHERE EXTRACT(YEAR FROM FILMS.RELEASE_DATE) = " + year + " ";
+            }
+        }
+
         final String sqlQuery = "SELECT* " +
                 "FROM FILMS " +
                 "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
-                "ORDER BY LIKES DESC, FILM_ID ASC " +
+                genreFilter +
+                yearFilter +
+                "ORDER BY LIKES DESC, FILMS.FILM_ID " +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, count);
+    }
+
+    @Override
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        log.debug("Запрос к БД на фильмы конкретного режиссёра");
+
+        String sortingCriteria = "";
+        if (sortBy.equals("year")) {
+            sortingCriteria = "ORDER BY RELEASE_DATE, FILMS.FILM_ID";
+        } else if (sortBy.equals("likes")) {
+            sortingCriteria = "ORDER BY LIKES DESC, FILMS.FILM_ID";
+        }
+        //При одинаковом количестве лайков или равндом годе выдаем в порядке ASC id
+        final String sqlQuery = "SELECT * FROM FILMS " +
+                "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
+                "JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                "WHERE FD.DIRECTOR_ID = ? " +
+                sortingCriteria;
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, directorId);
     }
 
     private static Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
@@ -172,6 +206,7 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
                 new Mpa(rs.getInt("MPA_ID"), rs.getString("MPA_NAME")),
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
     }
@@ -184,6 +219,7 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
                 new Mpa(),
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
     }
@@ -199,8 +235,76 @@ public class FilmDbStorage implements FilmStorage {
         final List<Film> films = jdbcTemplate.query(simpleQuery, FilmDbStorage::makeSimpleFilm, id);
 
         if (films.size() == 0) {
-            log.debug(String.format("Фильм с id = %d не был найден в базе", id));
-            throw new FilmNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Фильм с id = %d не найден в базе", id));
+        }
+    }
+
+    @Override
+    public List<Film> getUserRecommendations(Integer id) {
+        log.debug(String.format("Отправляем запрос на рекомендации для пользователя с id = %d из БД", id));
+        final String sqlQuery = "SELECT * " +
+                "FROM FILMS " +
+                "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
+                "WHERE FILM_ID IN " +
+                "( SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "EXCEPT " +
+                "SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ? )";
+
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, id);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        log.debug("Запрос к БД на список общих фильмов у двух пользователей");
+        final String sqlQuery = "SELECT * " +
+                "FROM FILMS " +
+                "INNER JOIN MPA M on M.MPA_ID = FILMS.MPA_ID " +
+                "WHERE FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ?) " +
+                "AND FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM FILMS_LIKES " +
+                "WHERE USER_ID = ?)" +
+                "ORDER BY LIKES DESC, FILM_ID";
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, userId, friendId);
+    }
+
+    @Override
+    public List<Film> getSearchedFilms(String query, String by) {
+        log.debug(String.format("Запрос к БД на поиск фильмов по %s", by));
+
+        switch (by) {
+            case "title":
+                final String sqlQueryTitle = "SELECT * " +
+                        "FROM FILMS " +
+                        "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                        "WHERE LOWER(FILM_NAME) LIKE LOWER(?) " +
+                        "ORDER BY LIKES DESC";
+                return jdbcTemplate.query(sqlQueryTitle, FilmDbStorage::makeFilm, "%" + query + "%");
+            case "director":
+                final String sqlQueryDirector = "SELECT * " +
+                        "FROM FILMS " +
+                        "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                        "JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                        "JOIN DIRECTORS ON FD.DIRECTOR_ID = DIRECTORS.DIRECTOR_ID " +
+                        "WHERE LOWER(DIRECTORS.DIRECTOR_NAME) LIKE LOWER(?) " +
+                        "ORDER BY LIKES DESC";
+                return jdbcTemplate.query(sqlQueryDirector, FilmDbStorage::makeFilm, "%" + query + "%");
+            default:
+                final String sqlQueryAll = "SELECT * " +
+                        "FROM FILMS " +
+                        "LEFT JOIN MPA on FILMS.MPA_ID = MPA.MPA_ID " +
+                        "LEFT JOIN FILMS_DIRECTORS FD on FD.FILM_ID = FILMS.FILM_ID " +
+                        "LEFT JOIN DIRECTORS ON FD.DIRECTOR_ID = DIRECTORS.DIRECTOR_ID " +
+                        "WHERE LOWER(FILM_NAME) LIKE LOWER(?) OR LOWER(DIRECTORS.DIRECTOR_NAME) LIKE LOWER(?) " +
+                        "ORDER BY LIKES DESC";
+                return jdbcTemplate.query(sqlQueryAll, FilmDbStorage::makeFilm, "%" + query + "%",
+                        "%" + query + "%");
         }
     }
 }

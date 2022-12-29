@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.dao.UserDbStorageTest;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import org.springframework.test.annotation.DirtiesContext;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -21,57 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserDbStorageTest {
 
     private final UserStorage userDbStorage;
-    private final JdbcTemplate jdbcTemplate;
-
 
     @BeforeEach
     public void addUser() {
         userDbStorage.add(createUser("mail@mail.ru", "Nick Name", "name", "1990-08-20"));
         userDbStorage.add(createUser("yandex@yandex.ru", "Mr Bin", "Bin", "1991-11-23"));
         userDbStorage.add(createUser("rim@mail.ru", "Rim", "Rimus", "1992-07-21"));
-    }
-
-    @AfterEach
-    public void clearDB() {
-        System.out.println("Удаляем данные");
-        String sqlQuery = "DROP TABLE FRIENDS ";
-        jdbcTemplate.update(sqlQuery);
-
-        sqlQuery = "DROP TABLE FILMS_LIKES";
-        jdbcTemplate.update(sqlQuery);
-
-        sqlQuery = "DROP TABLE USERS ";
-        jdbcTemplate.update(sqlQuery);
-
-        sqlQuery = "create table IF NOT EXISTS USERS (" +
-                "    USER_ID    INTEGER AUTO_INCREMENT," +
-                "    USER_EMAIL VARCHAR not null," +
-                "    USER_NAME  VARCHAR not null," +
-                "    USER_LOGIN VARCHAR not null," +
-                "    BIRTHDAY   DATE    not null," +
-                "    constraint USERS_PK primary key (USER_ID));" ;
-
-        jdbcTemplate.update(sqlQuery);
-
-        sqlQuery = "create table IF NOT EXISTS FILMS_LIKES( " +
-                "FILM_ID INTEGER not null," +
-                "USER_ID INTEGER not null," +
-                "constraint uq_likes UNIQUE (FILM_ID, USER_ID)," +
-        "constraint FILMS_LIKES_fk foreign key (FILM_ID) references FILMS ON DELETE CASCADE," +
-        "constraint FILMS_LIKES_USER_fk foreign key (USER_ID) references USERS ON DELETE CASCADE);";
-
-        jdbcTemplate.update(sqlQuery);
-
-        sqlQuery = "create table IF NOT EXISTS FRIENDS( " +
-                "USER_ID   INTEGER not null," +
-                "FRIEND_ID INTEGER not null," +
-                "constraint USER_FRIENDS_fk foreign key (USER_ID) references USERS ON DELETE CASCADE," +
-                "constraint FRIEND_USER_fk  foreign key (FRIEND_ID) references USERS (USER_ID) ON DELETE CASCADE);";
-
-        jdbcTemplate.update(sqlQuery);
     }
 
     @Test
@@ -112,7 +70,7 @@ public class UserDbStorageTest {
 
         userDbStorage.remove(1);
 
-        final UserNotFoundException exp = assertThrows(UserNotFoundException.class,
+        final EntityNotFoundException exp = assertThrows(EntityNotFoundException.class,
                 () -> userDbStorage.get(1));
         assertEquals("Пользователь с id = 1 не найден в базе", exp.getMessage());
     }
@@ -197,5 +155,4 @@ public class UserDbStorageTest {
         user.setBirthday(LocalDate.parse(birthday));
         return user;
     }
-
 }

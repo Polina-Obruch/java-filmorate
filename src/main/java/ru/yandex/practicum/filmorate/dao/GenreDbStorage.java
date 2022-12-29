@@ -9,17 +9,14 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.CountOfResultNotExpectedException;
-import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,8 +26,9 @@ public class GenreDbStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-
     public Genre getGenre(Integer id) {
+        log.debug("Запрос к БД на выдачу жанра");
+
         final String sqlQuery = "SELECT *" +
                 "FROM GENRE " +
                 "WHERE GENRE_ID = ? ";
@@ -38,8 +36,7 @@ public class GenreDbStorage {
         List<Genre> genre = jdbcTemplate.query(sqlQuery, GenreDbStorage::makeGenre, id);
 
         if (genre.isEmpty()) {
-            log.debug(String.format("Genre с id = %d не был найден в базе", id));
-            throw new GenreNotFoundException(String.format("Genre с id = %d не найден в базе", id));
+            throw new EntityNotFoundException(String.format("Genre с id = %d не найден в базе", id));
         }
 
         if (genre.size() != 1) {
@@ -49,25 +46,24 @@ public class GenreDbStorage {
         return genre.get(0);
     }
 
-
     public List<Genre> getAllGenre() {
+        log.debug("Запрос к БД на выдачу всех  жанров");
+
         final String sqlQuery = "SELECT *" +
                 "FROM GENRE ";
-
 
         List<Genre> genre = jdbcTemplate.query(sqlQuery, GenreDbStorage::makeGenre);
 
         if (genre.isEmpty()) {
-            log.debug("Genre не были найдены в базе");
-            throw new GenreNotFoundException("Genre не были найдены в базе");
+            throw new EntityNotFoundException("Genre не были найдены в базе");
         }
 
         return genre;
     }
 
-
     public void setFilmGenre(Film film) {
         log.debug("Запрос к БД на удаление старых жанров");
+
         Integer id = film.getId();
         final String sqlQuery = "DELETE FROM FILMS_GENRE " +
                 "WHERE FILM_ID = ? ";
@@ -81,6 +77,7 @@ public class GenreDbStorage {
         }
 
         log.debug("Запрос к БД на сохранение жанров для фильма");
+
         jdbcTemplate.batchUpdate("INSERT INTO FILMS_GENRE " +
                         "VALUES ( ?, ? )", new BatchPreparedStatementSetter() {
                     @Override
@@ -100,6 +97,7 @@ public class GenreDbStorage {
 
     public Film loadFilmGenre(Film film) {
         log.debug("Запрос к БД на загрузку жанров");
+
         final String sqlQuery = "SELECT *" +
                 "FROM FILMS_GENRE F " +
                 "INNER JOIN GENRE G on G.GENRE_ID = F.GENRE_ID " +
@@ -110,14 +108,14 @@ public class GenreDbStorage {
         return film;
     }
 
-
     public List<Film> loadFilmsGenre(List<Film> films) {
         log.debug("Запрос к БД на загрузку жанров для нескольких фильмов");
+
         List<Integer> ids = films.stream().map(Film::getId).collect(Collectors.toList());
-
-        Map<Integer, Film> filmMap = films.stream().collect
-                (Collectors.toMap(Film::getId, film -> film));
-
+        Map<Integer, Film> filmMap = new LinkedHashMap<>();
+        for (Film f : films) {
+            filmMap.put(f.getId(), f);
+        }
         SqlParameterSource parameters = new MapSqlParameterSource("ids", ids);
         NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 
