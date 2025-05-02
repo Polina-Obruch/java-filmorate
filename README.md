@@ -1,5 +1,5 @@
-# java-filmorate
-Template repository for Filmorate project.
+# Filmorate - приложение для оценки, рекоммендаций фильмов и обссуждения кино
+
 
 ___
 ### ER-Diagram
